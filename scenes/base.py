@@ -86,6 +86,14 @@ class Scene:
 
     # -- utilidades ----------------------------------------------------------
     def fondo(self, frame: np.ndarray) -> np.ndarray:
-        """Compone la carpa de circo detrás del jugador (si hay máscara)."""
+        """Compone la carpa detrás del jugador (si hay máscara) y dibuja su esqueleto encima.
+
+        Todas las escenas lo llaman al empezar draw(), así que el esqueleto queda
+        debajo de los paneles y botones.
+        """
+        from ui.skeleton import dibujar_esqueleto
         mascara = self.pose.mascara if self.pose is not None else None
-        return self.ctx.fondo.componer(frame, mascara)
+        frame = self.ctx.fondo.componer(frame, mascara)
+        if self.ctx.ajustes.esqueleto:
+            dibujar_esqueleto(frame, self.pose)
+        return frame

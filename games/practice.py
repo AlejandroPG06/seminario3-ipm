@@ -34,7 +34,7 @@ def consejos(prueba: str, res: dict) -> list[str]:
         if res.get("tiempo") is not None and res["tiempo"] > 13.69:
             lista.append("Prueba a levantarte un poco más rápido: echa el tronco hacia delante.")
     elif prueba == "marcha":
-        if res.get("pasos_der", 0) < C.MARCHA_REFERENCIA_PASOS * res.get("tiempo", 0) / C.MARCHA_EVAL_S:
+        if res.get("pasos_der", 0) < C.MARCHA_REFERENCIA_PASOS * res.get("tiempo", 0) / C.MARCHA_REFERENCIA_S:
             lista.append("Sube las rodillas hasta la línea y mantén un ritmo constante.")
         lista.append("Si te cansas, baja el ritmo, pero no te pares.")
     else:

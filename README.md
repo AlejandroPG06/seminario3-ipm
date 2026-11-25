@@ -26,7 +26,7 @@ su propio resultado y **no suman a la SPPB**:
 | Prueba | Qué mide | Referencia orientativa |
 |---|---|---|
 | Equilibrio sobre una pierna (hasta 30 s) | Equilibrio estático exigente | Menos de 5 s se asocia a más caídas (Vellas et al., 1997) |
-| Marcha en el sitio (2 min) | Resistencia aeróbica | 2-Minute Step Test (Rikli y Jones): pasos de la rodilla derecha hasta media altura del muslo |
+| Marcha en el sitio (50 s) | Resistencia aeróbica | Versión corta del 2-Minute Step Test (Rikli y Jones): pasos de la rodilla derecha hasta media altura del muslo; la referencia de 65 pasos en 2 min se escala a 50 s (27 pasos) |
 
 Hay tres modos:
 
@@ -170,6 +170,7 @@ El botón **Ajustes** (engranaje) del menú permite:
 - Quitar el **fondo de circo**: sin él MediaPipe no calcula la máscara de segmentación y el juego va más fluido.
 - Quitar las **animaciones** decorativas (confeti).
 - Cambiar la **detección** a "Rápida" (modelo `lite` de MediaPipe): más fps, algo menos de precisión.
+- Mostrar u ocultar el **esqueleto** detectado (los 33 puntos del Pose Landmarker y sus conexiones). Por defecto se ve siempre, en todas las pantallas.
 
 La pantalla muestra los fps actuales. Los ajustes se guardan solos en `data/ajustes.json`.
 

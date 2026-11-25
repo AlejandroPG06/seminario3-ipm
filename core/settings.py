@@ -18,6 +18,7 @@ class Ajustes:
     fondo: bool = True                  # carpa de circo detrás del jugador (segmentación)
     animaciones: bool = True            # confeti y otras animaciones decorativas
     deteccion_rapida: bool = False      # modelo «lite» de MediaPipe: más fps, algo menos preciso
+    esqueleto: bool = True              # dibujar los landmarks y conexiones detectados
     ultimo_jugador: str = "Invitado"    # se elige solo al volver a abrir el juego
 
     @classmethod

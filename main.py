@@ -97,19 +97,9 @@ def jugador_inicial(almacen: Almacen, ajustes, pedido: str | None) -> str:
     return ultimo if ultimo in almacen.todos_los_perfiles() else "Invitado"
 
 
-_CONEXIONES = None
-
-
 def dibujar_debug(frame: np.ndarray, escena: Scene, pose, fps: float) -> None:
     """Esqueleto, valores internos de la escena y fps."""
-    global _CONEXIONES
-    if pose is not None:
-        if _CONEXIONES is None:
-            import mediapipe as mp
-            _CONEXIONES = list(mp.solutions.pose.POSE_CONNECTIONS)
-        for a, b in _CONEXIONES:
-            if pose.vis(a) > C.VISIBILIDAD_MIN and pose.vis(b) > C.VISIBILIDAD_MIN:
-                cv2.line(frame, pose.px(a), pose.px(b), (255, 200, 0), 2, cv2.LINE_AA)
+    if pose is not None:                  # el esqueleto ya lo dibuja la escena; aquí, la visibilidad
         for i in range(33):
             color = C.VERDE if pose.vis(i) >= C.VISIBILIDAD_MIN else C.ROJO
             cv2.circle(frame, pose.px(i), 4, color, -1, cv2.LINE_AA)

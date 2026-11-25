@@ -186,8 +186,9 @@ def test_interpretaciones_complementarias():
     assert "riesgo" in interpretar_una_pierna(3.0)
     assert "riesgo" not in interpretar_una_pierna(C.UNA_PIERNA_RIESGO_S)
     assert "Excelente" in interpretar_una_pierna(30.0)
-    assert "baja" in interpretar_marcha(C.MARCHA_REFERENCIA_PASOS - 1)
-    assert "adecuada" in interpretar_marcha(C.MARCHA_REFERENCIA_PASOS)
+    ref = round(C.MARCHA_REFERENCIA_PASOS * C.MARCHA_EVAL_S / C.MARCHA_REFERENCIA_S)
+    assert "baja" in interpretar_marcha(ref - 1)
+    assert "adecuada" in interpretar_marcha(ref)
     assert "baja" in interpretar_marcha(None)
 
 

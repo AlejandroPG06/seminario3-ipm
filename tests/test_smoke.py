@@ -184,7 +184,8 @@ def test_evaluacion_con_complementarias(ctx):
     assert nombre(e) == "EscenaResultadosEvaluacion"
     comp = e.res["complementarias"]
     assert comp["una_pierna"]["valor"] == pytest.approx(8, abs=0.5)
-    assert comp["marcha"]["valor"] == pytest.approx(100, abs=3)   # 200 pasos en 120 s, la mitad con la dcha.
+    esperado = C.MARCHA_EVAL_S / 0.6 / 2                           # un paso cada 0,6 s, la mitad con la dcha.
+    assert comp["marcha"]["valor"] == pytest.approx(esperado, abs=3)
     fila = ctx.almacen.historial("Test")[-1]
     assert fila["t_una_pierna"] != "" and fila["pasos_marcha"] != ""
 

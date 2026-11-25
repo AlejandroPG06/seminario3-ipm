@@ -48,11 +48,17 @@ def interpretar_una_pierna(tiempo_s: float | None) -> str:
     return "Equilibrio sobre una pierna adecuado"
 
 
+def referencia_marcha(duracion_s: float = C.MARCHA_EVAL_S) -> int:
+    """Pasos de referencia (rodilla dcha.) para esa duración, en proporción al test de 2 min."""
+    return round(C.MARCHA_REFERENCIA_PASOS * duracion_s / C.MARCHA_REFERENCIA_S)
+
+
 def interpretar_marcha(pasos_der: float | None) -> str:
-    """Texto orientativo de la marcha de 2 min (pasos de la rodilla derecha)."""
+    """Texto orientativo de la marcha de la Evaluación (pasos de la rodilla derecha)."""
     n = int(pasos_der or 0)
-    if n < C.MARCHA_REFERENCIA_PASOS:
-        return f"Por debajo de {C.MARCHA_REFERENCIA_PASOS} pasos: resistencia baja"
+    ref = referencia_marcha()
+    if n < ref:
+        return f"Por debajo de {ref} pasos: resistencia baja"
     return "Resistencia adecuada"
 
 

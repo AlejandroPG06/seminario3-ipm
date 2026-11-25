@@ -36,6 +36,7 @@ class EscenaAjustes(_EscenaConMenu):
             "fondo": f"Fondo circo: {_si_no(a.fondo)}",
             "animaciones": f"Animaciones: {_si_no(a.animaciones)}",
             "deteccion": f"Detección: {'Rápida' if a.deteccion_rapida else 'Precisa'}",
+            "esqueleto": f"Esqueleto: {_si_no(a.esqueleto)}",
         }
 
     def opciones(self) -> list[tuple]:
@@ -48,6 +49,7 @@ class EscenaAjustes(_EscenaConMenu):
             (e["deteccion"], "deteccion", deteccion),
             (e["fondo"], "fondo"),
             (e["animaciones"], "animaciones"),
+            (e["esqueleto"], "esqueleto"),
             ("Volver", "volver"),
         ]
 
@@ -67,6 +69,8 @@ class EscenaAjustes(_EscenaConMenu):
             aj.fondo = not aj.fondo
         elif a == "animaciones":
             aj.animaciones = not aj.animaciones
+        elif a == "esqueleto":
+            aj.esqueleto = not aj.esqueleto
         elif a == "deteccion" and self.hay_modelo_rapido:
             aj.deteccion_rapida = not aj.deteccion_rapida
         self.ctx.guardar_ajustes()

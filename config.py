@@ -149,10 +149,11 @@ PELOTA_GANANCIA = 450.0         # grados/s² por aw: la pelota de la bailarina (
 # Marcha en el sitio (acto 4 «El Desfile» y prueba complementaria)
 # 2-Minute Step Test (Rikli y Jones): rodilla hasta la mitad entre rótula y cresta ilíaca.
 # ---------------------------------------------------------------------------
-MARCHA_EVAL_S = 120.0           # s, duración de la prueba clínica (2 minutos)
+MARCHA_EVAL_S = 50.0            # s, duración de la prueba en la Evaluación (versión corta del test de 2 min)
+MARCHA_REFERENCIA_S = 120.0     # s, duración del 2-Minute Step Test original (a la que se refieren los pasos)
 MARCHA_SUBIDA = 0.5             # fracción (0 = rodilla en reposo, 1 = a la altura de la cadera) para contar el paso
 MARCHA_BAJADA = 0.2             # fracción por debajo de la cual la rodilla vuelve a «abajo» (histéresis)
-MARCHA_REFERENCIA_PASOS = 65    # pasos de la rodilla derecha en 2 min; por debajo, baja resistencia (orientativo, verificar)
+MARCHA_REFERENCIA_PASOS = 65    # pasos de la rodilla derecha en 2 min; se escala a MARCHA_EVAL_S (orientativo, verificar)
 MARCHA_TOLERANCIA_S = 0.15      # s de margen respecto al tiempo para que un paso esté «al compás»
 PUNTOS_PASO = 10                # puntos por paso válido
 PUNTOS_COMPAS = 10              # puntos extra por paso al compás
@@ -371,6 +372,9 @@ BOTON_ANCHO = 420               # px
 BOTON_ALTO = 70                 # px
 BOTON_SEPARACION = 18           # px
 TEXTO_FLOTANTE_S = 1.2          # s que dura un texto flotante
+ESQUELETO_COLOR = (255, 200, 0)    # BGR, líneas del esqueleto detectado (azul claro)
+ESQUELETO_PUNTO = (255, 255, 255)  # BGR, articulaciones
+ESQUELETO_GROSOR = 0.006        # fracción del alto de la imagen: grosor de las líneas
 SILUETA_RELLENO = (35, 35, 35)  # BGR, relleno de las siluetas de pies (assets/pies_*.png)
 SILUETA_CONTORNO = (245, 245, 245)  # BGR, contorno para que se vean sobre fondos oscuros
 SILUETA_GROSOR = 0.035          # fracción del alto de la silueta: grosor del contorno

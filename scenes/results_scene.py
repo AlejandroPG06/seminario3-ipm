@@ -238,7 +238,7 @@ class EscenaResultadosEvaluacion(_EscenaConMenu):
             if "marcha" in comp:
                 v = comp["marcha"]["valor"]
                 desc = f"{int(v)} pasos (rodilla dcha.)" if v is not None else "no completada"
-                y = parrafo(frame, f"Marcha 2 min: {desc}", W // 2, y, C.TAM_PEQUENO - 2, C.BLANCO, ancho)
+                y = parrafo(frame, f"Marcha {C.MARCHA_EVAL_S:.0f} s: {desc}", W // 2, y, C.TAM_PEQUENO - 2, C.BLANCO, ancho)
                 y = parrafo(frame, comp["marcha"]["texto"], W // 2, y, C.TAM_PEQUENO - 6, C.CREMA_CARPA, ancho)
         y = parrafo(frame, "SPPB reducida (sin marcha de 4 m). Orientativa: no es un diagnóstico.",
                     W // 2, y + 6, C.TAM_PEQUENO - 8, C.GRIS, ancho)

@@ -106,7 +106,7 @@ class FlujoEvaluacion:
             return EscenaPregunta(
                 self.ctx, "Pruebas complementarias",
                 ["La SPPB ha terminado. ¿Quieres hacer dos pruebas más?",
-                 "Equilibrio sobre una pierna (30 s) y marcha en el sitio (2 min).",
+                 f"Equilibrio sobre una pierna ({C.UNA_PIERNA_EVAL_S:.0f} s) y marcha en el sitio ({C.MARCHA_EVAL_S:.0f} s).",
                  "No cambian tu puntuación SPPB.", C.AVISO_SEGURIDAD],
                 [("Sí, hacerlas", self._aceptar_complementarias),
                  ("No, ver resultados", self._omitir_complementarias)])
@@ -223,7 +223,7 @@ class FlujoAventura:
         fila = {"jugador": self.ctx.jugador, "modo": "aventura", "prueba": acto["prueba"],
                 "acto": acto_id, "nivel": n_nivel, "puntos": res["puntos"], "estrellas": estrellas,
                 "racha_max_s": f"{res.get('racha_max_s', 0):.1f}"}
-        if acto["mecanica"] != "tambor":     # los pasos de la Aventura no son comparables con la prueba de 2 min
+        if acto["mecanica"] != "tambor":     # los pasos de la Aventura no son comparables con la prueba de la Evaluación
             fila.update(fila_resultado(acto["prueba"], res))
         self.ctx.almacen.registrar_sesion(fila)
         nuevos = actualizar_logros(self.ctx, perfil)

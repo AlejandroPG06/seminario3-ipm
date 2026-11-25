@@ -144,3 +144,17 @@ def test_siluetas_de_pies_con_contorno(prueba):
     f = frame_negro()
     pictograms.instrucciones(f, prueba, "Título", "Línea", 0.2, 0.5, "", sp)
     pictograms.recordatorio(f, prueba, 0.2, sp)
+
+
+# -- Esqueleto ----------------------------------------------------------------------------
+
+def test_el_esqueleto_se_dibuja_en_todas_las_escenas(ctx):
+    from scenes.menu import EscenaMenu
+    m = EscenaMenu(ctx)
+    m.update(pose_de_pie(), 1 / 30)
+    con = m.fondo(frame_negro())
+    azul = (con == C.ESQUELETO_COLOR).all(axis=2).sum()
+    assert azul > 200                                    # líneas del cuerpo, no solo puntos
+    ctx.ajustes.esqueleto = False
+    sin = m.fondo(frame_negro())
+    assert (sin == C.ESQUELETO_COLOR).all(axis=2).sum() == 0
