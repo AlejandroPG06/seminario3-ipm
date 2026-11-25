@@ -20,7 +20,7 @@ from core.pose import MonitorVisibilidad
 from games.hazards import Burbujas, Viento
 from games.one_leg import APOYADO, DetectorUnaPierna
 from games.posture import VigilantePies, separacion_pies, verificar_postura
-from games.scoring import MarcadorEquilibrio, estrellas_por_peligro
+from games.scoring import MarcadorEquilibrio, estrellas_por_peligro, estrellas_silla
 from games.tightrope import CuerdaFloja
 from games.tray import Bandeja
 from scenes.base import Scene, Transicion
@@ -58,6 +58,8 @@ class EscenaEquilibrio(Scene):
         self.al_cancelar = al_cancelar
         self.objetivo = float(self.nivel.get("duracion_s", duracion_clinica(prueba)))
         self.mecanica = self.acto.get("mecanica") if self.aventura else None
+        self.cruzar = self.mecanica == "cuerda" and bool(self.nivel.get("cruzar"))
+        self.avance_s = float(self.nivel.get("avance_s", self.objetivo))
         self.brazos = DetectorBrazosArriba()
         self.monitor = MonitorVisibilidad(C.GRUPOS_CLAVE_EQUILIBRIO)
         self.textos = TextosFlotantes()
@@ -79,7 +81,11 @@ class EscenaEquilibrio(Scene):
         self.marcador = MarcadorEquilibrio()
         self.bandeja = Bandeja(int(self.nivel.get("objetos", 1)))
         ganancia = C.PELOTA_GANANCIA if self.mecanica == "pelota" else C.CUERDA_GANANCIA
-        self.cuerda = CuerdaFloja(ganancia=ganancia)   # también sirve de física para la pelota
+        inestabilidad = float(self.nivel.get("inestabilidad", 0.0)) if self.aventura else 0.0
+        zona = C.CUERDA_ZONA_MUERTA if inestabilidad > 0 else C.ZONA_MUERTA_BALANCEO
+        self.cuerda = CuerdaFloja(ganancia=ganancia, inestabilidad=inestabilidad, zona=zona,
+                                  rng=np.random.default_rng(self.ctx.semilla))   # también para la pelota
+        self.avance = 0.0            # 0-1, «Cruza la cuerda»
         self.pierna = DetectorUnaPierna()
         self.vigilante: VigilantePies | None = None
         self.cadera_ref = self.calib.cadera_x
@@ -189,13 +195,20 @@ class EscenaEquilibrio(Scene):
             if caido:
                 mensaje = {"cuerda": "¡Se ha caído!", "pelota": "¡Se ha caído de la pelota!"}
                 return self._terminar(False, mensaje.get(self.mecanica, "¡Se ha caído el vaso!"))
+            if self.cruzar:
+                if self.cuerda.peligro < C.CRUZAR_PELIGRO_MAX:
+                    self.avance = min(1.0, self.avance + dt / self.avance_s)
+                if self.avance >= 1.0:
+                    return self._terminar(True, "¡Has cruzado la cuerda!")
             for ev in eventos:
                 if ev == "pulso_acero":
-                    self.textos.anadir("¡Pulso de acero! x2", (pose.px(C.NARIZ)[0], 160), C.VERDE)
+                    self.textos.anadir("¡Pulso de acero! x2", (pose.px(C.NARIZ)[0], 250), C.VERDE)
                 elif ev == "racha":
-                    self.textos.anadir(f"¡Racha! x{self.marcador.mult_racha:.2f}", (pose.px(C.NARIZ)[0], 200), C.AMARILLO)
+                    self.textos.anadir(f"¡Racha! x{self.marcador.mult_racha:.2f}", (pose.px(C.NARIZ)[0], 300), C.AMARILLO)
                     self.ctx.audio.reproducir("acierto")
         if self.t >= self.objetivo:
+            if self.cruzar:
+                return self._terminar(False, "Se acabó el tiempo")
             return self._terminar(True, "¡Conseguido!")
         return None
 
@@ -203,7 +216,7 @@ class EscenaEquilibrio(Scene):
         """Actualiza viento, bandeja/cuerda y burbujas. True si se ha caído."""
         viento = self.viento.actualizar(dt)
         if self.viento.nueva_rafaga:
-            self.textos.anadir("¡Ráfaga de viento!", (pose.ancho // 2, 260), C.AZUL)
+            self.textos.anadir("¡Ráfaga de viento!", (pose.ancho // 2, 350), C.AZUL)
         if self.burbujas is not None:
             hombros = punto_medio(pose.px(C.HOMBRO_IZQ), pose.px(C.HOMBRO_DER))
             manos = [pose.px(i) for i in (C.INDICE_IZQ, C.INDICE_DER) if pose.vis(i) >= C.VISIBILIDAD_MIN]
@@ -217,6 +230,12 @@ class EscenaEquilibrio(Scene):
         caido = modelo.actualizar(self.balanceo, dt, viento)
         self.peligro_max = max(self.peligro_max, 1.0 if caido else modelo.peligro)
         return caido
+
+    def estrellas_posibles(self) -> int:
+        """Estrellas que aún se pueden conseguir (en «Cruza la cuerda» dependen del tiempo)."""
+        if self.cruzar:
+            return estrellas_silla(self.t, tuple(self.nivel["estrellas_s"]))
+        return estrellas_por_peligro(self.peligro_max, self.umbrales_estrellas)
 
     @property
     def umbrales_estrellas(self) -> tuple[float, float]:
@@ -232,6 +251,8 @@ class EscenaEquilibrio(Scene):
             "balanceo_medio": self.marcador.balanceo_medio,
             "balanceo_signo": self.marcador.balanceo_medio_signo,
             "peligro_max": self.peligro_max,
+            "cruzar": self.cruzar,
+            "avance": self.avance,
             "racha_max_s": self.marcador.racha_max_s,
             "burbujas": self.burbujas.tocadas if self.burbujas else 0,
             "viento": self.viento.fuerza > 0,
@@ -268,6 +289,10 @@ class EscenaEquilibrio(Scene):
             self._dibujar_mecanica(frame)
         if self.fase == "jugando" and self.viento.activa:
             self._dibujar_viento(frame)
+        elif self.fase == "jugando" and self.nivel.get("aviso_viento") and self.viento.aviso():
+            self._dibujar_aviso_viento(frame)
+        if self.fase == "jugando" and self.mecanica in ("cuerda", "pelota") and self.pose is not None:
+            self._dibujar_correccion(frame)
         if self.burbujas is not None and self.fase == "jugando":
             for b in self.burbujas.items:
                 self.ctx.sprites.burbuja(frame, (b.x, b.y), C.BURBUJA_RADIO * W)
@@ -277,6 +302,10 @@ class EscenaEquilibrio(Scene):
             if self.una_pierna:
                 subtitulo += " · " + C.AVISO_SEGURIDAD
             linea = f"{C.INSTRUCCION_CORTA[self.prueba]} · {self.objetivo:.0f} s"
+            if self.cruzar:
+                linea = f"Quieto para avanzar · cruza en {self.objetivo:.0f} s"
+            if self.aventura and self.nivel.get("inestabilidad", 0) > C.CUERDA_RIGIDEZ:
+                subtitulo += " · Si se inclina, mueve la cadera hacia la flecha"
             pictograms.instrucciones(frame, self.prueba, encabezado, linea, self.t_fase,
                                      self.brazos.progreso, subtitulo, self.ctx.sprites)
             if self.aviso_postura:
@@ -292,8 +321,7 @@ class EscenaEquilibrio(Scene):
                 marcador(frame, int(self.marcador.puntos) + self.puntos_extra,
                          self.marcador.racha_s, self.marcador.multiplicador)
                 semaforo(frame, W - 80, 160, abs(self.balanceo))
-                estrellas_en_juego(frame, (170, 160), estrellas_por_peligro(self.peligro_max, self.umbrales_estrellas),
-                                   self.ctx.sprites)
+                estrellas_en_juego(frame, (170, 160), self.estrellas_posibles(), self.ctx.sprites)
             else:
                 titulo(frame, nombre, 20)
                 barra_balanceo(frame, W // 2, H - 50, self.balanceo)
@@ -317,6 +345,32 @@ class EscenaEquilibrio(Scene):
         for y in (int(H * 0.35), int(H * 0.5), int(H * 0.65)):
             x0 = int(W * 0.12) if d > 0 else int(W * 0.88)
             cv2.arrowedLine(frame, (x0, y), (x0 + d * largo, y), C.AZUL, 6, cv2.LINE_AA, tipLength=0.3)
+
+    def _dibujar_aviso_viento(self, frame) -> None:
+        """Un segundo antes de la ráfaga: flechas parpadeantes desde el lado del que vendrá."""
+        H, W = frame.shape[:2]
+        if int(self.t_fase * 6) % 2:
+            return
+        d = self.viento.direccion
+        x0 = int(W * 0.06) if d > 0 else int(W * 0.94)
+        for y in (int(H * 0.4), int(H * 0.55)):
+            cv2.arrowedLine(frame, (x0, y), (x0 + d * 90, y), C.AMARILLO, 5, cv2.LINE_AA, tipLength=0.35)
+        lado = "izquierda" if d > 0 else "derecha"
+        texto(frame, f"¡Viento por la {lado}!", (W // 2, int(H * 0.80)), C.TAM_TEXTO + 4, C.AMARILLO, "centro")
+
+    def _dibujar_correccion(self, frame) -> None:
+        """Flecha junto a la cadera hacia donde hay que moverla para enderezar al funambulista."""
+        sentido = self.cuerda.correccion
+        if sentido == 0:
+            return
+        cadera = punto_medio(self.pose.px(C.CADERA_IZQ), self.pose.px(C.CADERA_DER))
+        x, y = int(cadera[0]), int(cadera[1])
+        largo = int(60 + 80 * self.cuerda.peligro)
+        color = C.NARANJA if self.cuerda.peligro > 0.65 else C.AMARILLO
+        cv2.arrowedLine(frame, (x - sentido * 20, y), (x + sentido * largo, y), (30, 30, 30), 16, cv2.LINE_AA,
+                        tipLength=0.4)
+        cv2.arrowedLine(frame, (x - sentido * 20, y), (x + sentido * largo, y), color, 10, cv2.LINE_AA,
+                        tipLength=0.4)
 
     def _dibujar_mecanica(self, frame) -> None:
         pose = self.pose
@@ -359,11 +413,15 @@ class EscenaEquilibrio(Scene):
         cv2.polylines(frame, [pts], False, (40, 90, 140), 8, cv2.LINE_AA)
         for e in (pts[0], pts[2]):
             cv2.circle(frame, tuple(int(v) for v in e), 14, C.DORADO, -1, cv2.LINE_AA)
-        # Mini funambulista que cruza la cuerda según el tiempo
-        x0, x1, y = int(W * 0.25), int(W * 0.75), 150
+        # Mini funambulista que cruza la cuerda: según el tiempo o, en «Cruza la cuerda», según la estabilidad
+        x0, x1, y = int(W * 0.32), int(W * 0.72), 150
         self.ctx.sprites.cuerda(frame, x0, x1, y, c.amplitud_cuerda * 0.3, c.fase, postes=25)
-        avance = min(1.0, self.t / self.objetivo)
+        avance = self.avance if self.cruzar else min(1.0, self.t / self.objetivo)
         self.ctx.sprites.funambulista(frame, (x0 + (x1 - x0) * avance, y), 90, c.angulo)
+        if self.cruzar and self.fase == "jugando":
+            parado = c.peligro >= C.CRUZAR_PELIGRO_MAX
+            txt = "¡Quieto para avanzar!" if parado else f"Cruzando: {avance * 100:.0f} %"
+            texto(frame, txt, (W // 2, y + 30), C.TAM_TEXTO - 2, C.NARANJA if parado else C.VERDE, "centro")
 
     def _dibujar_pelota(self, frame) -> None:
         """Bailarina sobre una pelota gigante, a la izquierda para no tapar al jugador."""

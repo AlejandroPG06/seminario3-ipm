@@ -2,6 +2,8 @@
 import math
 
 import numpy as np
+
+import config as C
 import pytest
 
 from games.hazards import Burbujas, Viento
@@ -111,6 +113,19 @@ def test_burbujas_se_tocan():
     assert tocadas and b.tocadas == 1
 
 
+def test_burbujas_a_los_lados_y_no_sobre_la_cabeza():
+    """Salen alternando los lados, al alcance del brazo, lejos de la vertical de la cabeza."""
+    b = Burbujas(np.random.default_rng(3), intervalo=0.2, vida=100)
+    centro, aw = (640, 300), 120
+    for _ in range(30 * 6):
+        b.actualizar(DT, [], centro, aw, 20, 1280, 720)
+    xs = [it.x - centro[0] for it in b.items]
+    assert len(b.items) >= 10
+    assert any(x < 0 for x in xs) and any(x > 0 for x in xs)
+    assert min(abs(x) for x in xs) > 0.9 * aw                 # nunca justo encima de la cabeza
+    assert any(it.y > centro[1] for it in b.items)            # también alguna por debajo del hombro
+
+
 def test_fisica_independiente_de_los_fps():
     """Con 10 fps o con 60 fps el vaso cae más o menos en el mismo instante."""
     def instante_caida(fps):
@@ -120,3 +135,31 @@ def test_fisica_independiente_de_los_fps():
                 return i / fps
     t10, t60 = instante_caida(10), instante_caida(60)
     assert t10 is not None and abs(t10 - t60) < 0.15
+
+
+def test_cuerda_inestable_se_cae_sola_si_no_se_corrige():
+    for semilla in range(5):
+        c = CuerdaFloja(inestabilidad=4.8, rng=np.random.default_rng(semilla))
+        assert simular(c, [0.0] * 30 * 25)
+
+
+def test_cuerda_inestable_se_mantiene_corrigiendo():
+    c = CuerdaFloja(inestabilidad=5.2, zona=C.CUERDA_ZONA_MUERTA, rng=np.random.default_rng(0))
+    for _ in range(30 * 20):
+        assert not c.actualizar(-0.01 * c.angulo, DT)
+    assert c.correccion in (-1, 0, 1)
+
+
+def test_viento_avisa_antes_de_la_rafaga():
+    v = Viento(1.0, np.random.default_rng(2))
+    avisos, direccion = 0, None
+    for _ in range(30 * 20):
+        antes = v.aviso()
+        if antes:
+            avisos += 1
+            direccion = v.direccion
+        v.actualizar(DT)
+        if v.nueva_rafaga:
+            assert direccion == v.direccion and avisos > 0      # la dirección avisada es la de la ráfaga
+            return
+    raise AssertionError("no hubo ráfaga")

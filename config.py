@@ -135,6 +135,12 @@ CUERDA_GANANCIA = 600.0         # grados/s² por aw de balanceo
 CUERDA_RIGIDEZ = 4.0            # 1/s², fuerza recuperadora hacia el centro
 CUERDA_AMORTIGUACION = 2.5      # 1/s, amortiguación de la velocidad angular
 CUERDA_ANGULO_MAX = 35.0        # grados, si se supera el funambulista cae
+CUERDA_ZONA_MUERTA = 0.012      # aw, zona muerta en la cuerda y la pelota (más fina: hay que corregir con precisión)
+CUERDA_TEMBLOR = 12.0           # grados/s², perturbación aleatoria cuando hay inestabilidad
+CUERDA_TEMBLOR_TAU_S = 1.5      # s, lo que tarda el temblor en cambiar de lado
+CUERDA_AVISO_PELIGRO = 0.35     # fracción del ángulo máximo a partir de la que se indica hacia dónde corregir
+# Inestabilidad por nivel (clave "inestabilidad", 1/s²): por encima de CUERDA_RIGIDEZ el
+# funambulista se cae solo si no se corrige. Cuanto más alta, más rápido se va.
 
 # ---------------------------------------------------------------------------
 # Equilibrio sobre una pierna (acto 3 «La Bailarina» y prueba complementaria)
@@ -227,10 +233,14 @@ CANON_VUELO_S = 2.5             # s que dura la animación del disparo
 # ---------------------------------------------------------------------------
 VIENTO_INTERVALO_S = (3.0, 6.0)     # s, rango aleatorio entre ráfagas
 VIENTO_DURACION_S = 1.5             # s, duración de cada ráfaga
+VIENTO_AVISO_S = 1.2                # s antes de una ráfaga en que se avisa (niveles con "aviso_viento")
+CRUZAR_PELIGRO_MAX = 0.30           # 0-1, en «Cruza la cuerda» el funambulista avanza si el peligro es menor
 BURBUJA_INTERVALO_S = 2.5           # s entre burbujas
 BURBUJA_VIDA_S = 4.0                # s antes de que una burbuja desaparezca
 BURBUJA_RADIO = 0.045               # fracción del ancho de imagen
-BURBUJA_ALCANCE = (1.0, 1.7)        # aw, distancia desde el hombro a la que aparecen
+BURBUJA_ALCANCE = (1.3, 2.0)        # aw, distancia desde el hombro de ese lado (≈ brazo estirado)
+BURBUJA_ANGULO = (-65.0, 40.0)      # grados respecto a la horizontal hacia fuera (negativo = por encima del hombro)
+BURBUJA_SEPARACION = 3.0            # radios de burbuja: distancia mínima entre dos burbujas a la vez
 
 # ---------------------------------------------------------------------------
 # Modo Aventura: actos y niveles (datos; añadir/editar aquí)
@@ -256,10 +266,18 @@ ACTOS = [
         "vista": "frente",
         "descripcion": "Tándem. Cruza la cuerda sin caer.",
         "niveles": [
-            {"nombre": "Primeros pasos", "duracion_s": 10, "objetos": 1, "viento": 0.0, "burbujas": False},
-            {"nombre": "Cuerda larga", "duracion_s": 20, "objetos": 1, "viento": 0.0, "burbujas": False},
-            {"nombre": "Vendaval", "duracion_s": 15, "objetos": 1, "viento": 60.0, "burbujas": False},
-            {"nombre": "Funambulista estrella", "duracion_s": 20, "objetos": 1, "viento": 0.0, "burbujas": True},
+            # inestabilidad > CUERDA_RIGIDEZ (4): el funambulista se cae solo si no corriges con la cadera
+            {"nombre": "Primeros pasos", "duracion_s": 10, "objetos": 1, "viento": 0.0, "burbujas": False,
+             "inestabilidad": 4.3},
+            # cruzar: el funambulista solo avanza mientras está estable; hay que llegar al otro lado
+            # (avance_s de estabilidad) antes de duracion_s; estrellas_s = tiempos para 1★, 2★, 3★
+            {"nombre": "Cruza la cuerda", "duracion_s": 35, "objetos": 1, "viento": 0.0, "burbujas": False,
+             "inestabilidad": 4.8, "cruzar": True, "avance_s": 15, "estrellas_s": (35, 25, 18)},
+            # aviso_viento: flechas un segundo antes de cada ráfaga para anticiparse
+            {"nombre": "Vendaval", "duracion_s": 15, "objetos": 1, "viento": 45.0, "burbujas": False,
+             "inestabilidad": 4.5, "aviso_viento": True},
+            {"nombre": "Malabarista", "duracion_s": 20, "objetos": 1, "viento": 0.0, "burbujas": True,
+             "inestabilidad": 5.2},
         ],
     },
     {
@@ -268,9 +286,12 @@ ACTOS = [
         "descripcion": "Una pierna. No te caigas de la pelota.",
         "niveles": [
             {"nombre": "Puntillas", "duracion_s": 8, "objetos": 1, "viento": 0.0, "burbujas": False},
-            {"nombre": "A la pata coja", "duracion_s": 15, "objetos": 1, "viento": 0.0, "burbujas": False},
-            {"nombre": "Brisa en la pista", "duracion_s": 12, "objetos": 1, "viento": 40.0, "burbujas": False},
-            {"nombre": "Baile de burbujas", "duracion_s": 15, "objetos": 1, "viento": 0.0, "burbujas": True},
+            {"nombre": "A la pata coja", "duracion_s": 15, "objetos": 1, "viento": 0.0, "burbujas": False,
+             "inestabilidad": 4.3},
+            {"nombre": "Brisa en la pista", "duracion_s": 12, "objetos": 1, "viento": 30.0, "burbujas": False,
+             "inestabilidad": 4.3, "aviso_viento": True},
+            {"nombre": "Baile de burbujas", "duracion_s": 15, "objetos": 1, "viento": 0.0, "burbujas": True,
+             "inestabilidad": 4.6},
         ],
     },
     {

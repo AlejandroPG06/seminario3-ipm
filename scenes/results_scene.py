@@ -151,7 +151,13 @@ class EscenaResultadosNivel(_EscenaConMenu):
                 lineas.append(f"Al compás: {r['al_compas']} de {r['pasos']}")
         else:
             lineas.append(f"{r['motivo']} · {r['tiempo']:.1f} s")
-            if r.get("completado") and self.estrellas < 3:
+            if r.get("cruzar"):
+                nivel = acto["niveles"][self.n_nivel - 1]
+                if not r.get("completado"):
+                    lineas.append(f"Llegaste al {r.get('avance', 0.0) * 100:.0f} % de la cuerda")
+                elif self.estrellas < 3:
+                    lineas.append(f"Para 3 estrellas, cruza en menos de {nivel['estrellas_s'][2]:.0f} s")
+            elif r.get("completado") and self.estrellas < 3:
                 cosa = {"cuerda": "El funambulista", "pelota": "La bailarina"}.get(acto["mecanica"], "El vaso")
                 lineas.append(f"{cosa} llegó al {r.get('peligro_max', 0.0) * 100:.0f} % de caerse: "
                               "¡mantenlo en el centro para más estrellas!")

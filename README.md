@@ -51,7 +51,7 @@ Hay tres modos:
 | Acto | Ejercicio | Mecánica |
 |---|---|---|
 | 1. El Camarero | Pies juntos | Llevas una bandeja en el pecho; si balanceas la cadera, el vaso se desliza y se cae |
-| 2. La Cuerda Floja | Tándem | Una pértiga y un funambulista que oscilan con tu balanceo |
+| 2. La Cuerda Floja | Tándem | El funambulista se cae solo si no lo corriges: una flecha indica hacia dónde mover la cadera |
 | 3. La Bailarina | Sobre una pierna | Una bailarina sobre una pelota que rueda con tu balanceo; si apoyas el pie, se cae |
 | 4. El Desfile | Marcha en el sitio | Cada paso con la rodilla hasta la línea toca el tambor; bonus por ir al compás |
 | 5. El Hombre Bala | 5 levantadas de la silla | Cada levantada carga el cañón; cuanto más rápido, más lejos vuelas |
@@ -61,6 +61,15 @@ Cada acto tiene 4 niveles: la prueba tal cual, una versión más difícil, una c
 **viento** o más ritmo, y una de **doble tarea** (tocar burbujas con la mano sin
 perder el equilibrio o sin dejar de marchar). Cada nivel da de 0 a 3 estrellas; con
 **2 estrellas** en un nivel se desbloquea el acto siguiente.
+
+**La Cuerda Floja** tiene un reto distinto en cada nivel: *Primeros pasos* (aprender a
+corregir), *Cruza la cuerda* (el funambulista solo avanza mientras estás estable y hay
+que llegar al otro lado a tiempo; las estrellas dependen de lo rápido que cruces),
+*Vendaval* (ráfagas avisadas con flechas un segundo antes) y *Malabarista* (más
+inestable y con burbujas a los lados). La física es un péndulo invertido: la dificultad
+está en corregir con **precisión**, con movimientos pequeños de cadera, no en moverse
+mucho. La Bailarina usa la misma física, más suave. Las burbujas de la doble tarea
+salen a los lados, al alcance del brazo, alternando izquierda y derecha.
 
 **Estrellas de equilibrio**: hay que aguantar el nivel entero sin que se caiga el
 vaso, el funambulista o la bailarina (si se cae, 0 estrellas). Después cuenta lo

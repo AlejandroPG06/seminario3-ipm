@@ -199,6 +199,8 @@ class FlujoAventura:
             return estrellas_silla(res.get("tiempo"), tuple(nivel["estrellas_s"]))
         if acto["mecanica"] == "tambor":
             return estrellas_marcha(res["pasos"], tuple(nivel["estrellas_pasos"]))
+        if nivel.get("cruzar"):            # «Cruza la cuerda»: cuanto antes llegues, más estrellas
+            return estrellas_silla(res["tiempo"] if res.get("completado") else None, tuple(nivel["estrellas_s"]))
         umbrales = tuple(nivel.get("estrellas_peligro", C.ESTRELLAS_PELIGRO))
         return estrellas_equilibrio(res["tiempo"], float(nivel["duracion_s"]), res.get("peligro_max", 0.0), umbrales)
 

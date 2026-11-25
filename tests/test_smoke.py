@@ -153,6 +153,18 @@ def una_pierna_tras(inicio):
     return lambda t: pose_de_pie(elev_izq=0.5 if t >= inicio else 0.0)
 
 
+def corrigiendo(escena, pose_fn, k=0.01):
+    """Jugador sintético que mueve la cadera en contra del funambulista o la bailarina (k = aw por grado)."""
+    def f(t):
+        p = pose_fn(t)
+        c = getattr(escena, "cuerda", None)
+        if c is not None:
+            dx = -k * c.angulo * escena.calib.anchura_hombros / p.aspecto     # aw → x normalizada
+            p.lm[[C.CADERA_IZQ, C.CADERA_DER], 0] += max(-0.05, min(0.05, dx))
+        return p
+    return f
+
+
 def marchando(periodo=0.6, altura=0.7):
     """Pose que alterna rodillas: cada paso dura `periodo` s."""
     def f(t):
@@ -266,7 +278,7 @@ def test_aventura_bailarina(ctx, nivel):
     assert nombre(e) == "EscenaEquilibrio" and e.mecanica == "pelota"
     e = tecla(e, "enter")
     duracion = C.ACTOS[2]["niveles"][nivel - 1]["duracion_s"]
-    e = ejecutar(e, una_pierna_tras(C.CUENTA_ATRAS_S + 0.5), C.CUENTA_ATRAS_S + duracion + 5)
+    e = ejecutar(e, corrigiendo(e, una_pierna_tras(C.CUENTA_ATRAS_S + 0.5)), C.CUENTA_ATRAS_S + duracion + 5)
     assert nombre(e) == "EscenaResultadosNivel"
     assert e.res["completado"] and e.estrellas >= 1
 
@@ -408,3 +420,38 @@ def test_practica_completa(ctx, prueba):
     fila = ctx.almacen.historial("Test")[-1]
     assert fila["modo"] == "practica" and fila["prueba"] == prueba
     assert nombre(tecla(e, "enter")) == "EscenaColocacion"  # Repetir
+
+
+# -- Cuerda floja con física inestable ---------------------------------------------------
+
+def _nivel_cuerda(ctx, nivel):
+    from scenes.flows import FlujoAventura
+    e = ejecutar(FlujoAventura(ctx).jugar(2, nivel), de_pie, C.ENCUADRE_OK_S + C.CALIB_DURACION_S + 1)
+    assert nombre(e) == "EscenaEquilibrio" and e.mecanica == "cuerda"
+    return tecla(e, "enter")
+
+
+def test_cuerda_sin_corregir_se_cae(ctx):
+    e = _nivel_cuerda(ctx, 4)
+    e = ejecutar(e, de_pie, C.CUENTA_ATRAS_S + 25)
+    assert nombre(e) == "EscenaResultadosNivel" and not e.res["completado"] and e.estrellas == 0
+
+
+@pytest.mark.parametrize("nivel", [1, 3, 4])
+def test_cuerda_corrigiendo_se_supera(ctx, nivel):
+    e = _nivel_cuerda(ctx, nivel)
+    duracion = C.ACTOS[1]["niveles"][nivel - 1]["duracion_s"]
+    e = ejecutar(e, corrigiendo(e, de_pie), C.CUENTA_ATRAS_S + duracion + 5, dibujar_cada=3)
+    assert nombre(e) == "EscenaResultadosNivel" and e.res["completado"] and e.estrellas >= 1
+
+
+def test_cruza_la_cuerda(ctx):
+    e = _nivel_cuerda(ctx, 2)
+    assert e.cruzar
+    niv = C.ACTOS[1]["niveles"][1]
+    e = ejecutar(e, corrigiendo(e, de_pie), C.CUENTA_ATRAS_S + niv["duracion_s"] + 5, dibujar_cada=3)
+    assert nombre(e) == "EscenaResultadosNivel" and e.res["completado"]
+    assert e.res["avance"] == pytest.approx(1.0)
+    assert niv["avance_s"] - 0.1 <= e.res["tiempo"] < niv["duracion_s"]
+    assert e.estrellas >= 2                                   # el jugador sintético corrige bien
+    e.draw(frame_negro())
