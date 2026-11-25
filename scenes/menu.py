@@ -85,7 +85,8 @@ class EscenaMenu(Scene):
         if self.menu is None:
             self._crear_menu(frame.shape[1], frame.shape[0])
         titulo(frame, "El Gran Circo del Equilibrio", 20)
-        texto(frame, "Estira el brazo hacia un botón y mantén la mano 2 s",
+        segundos = f"{C.DWELL_S:g}".replace(".", ",")
+        texto(frame, f"Estira el brazo hacia un botón y mantén la mano {segundos} s",
               (frame.shape[1] // 2, 88), C.TAM_PEQUENO, C.BLANCO, "centro")
         self.menu.dibujar(frame, self.ctx.sprites)
         dibujar_manos(frame, manos_px(self.pose))

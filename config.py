@@ -84,7 +84,7 @@ VISTA_LADO_RATIO_MAX = 0.30     # anchura hombros / altura torso máxima para es
 # ---------------------------------------------------------------------------
 # Gestos
 # ---------------------------------------------------------------------------
-DWELL_S = 2.0                   # s con la mano sobre un botón para pulsarlo
+DWELL_S = 1.5                   # s con la mano sobre un botón para pulsarlo
 DWELL_DECAIMIENTO = 2.0         # factor: velocidad a la que se vacía el anillo al quitar la mano
 DWELL_BLOQUEO_S = 1.0           # s sin aceptar dwell al abrir un menú o tras pulsar (evita pulsaciones encadenadas)
 # Menús en dos columnas a los lados: con las manos en reposo (junto a la cadera) no se toca ningún botón

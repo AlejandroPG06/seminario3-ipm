@@ -159,7 +159,7 @@ calibración.
 
 Todo se puede manejar **sin teclado**:
 
-- **Botones con dwell**: estira el brazo hacia un botón y mantén la mano 2 s hasta que se llene el anillo.
+- **Botones con dwell**: estira el brazo hacia un botón y mantén la mano 1,5 s hasta que se llene el anillo (`DWELL_S`).
   Los botones están en dos columnas a los lados, así que con los brazos en reposo no se pulsa nada.
   Solo carga un botón a la vez y, al cambiar de pantalla, hay 1 s de bloqueo.
 - **Pictogramas**: cada ejercicio se explica con un muñeco animado y la posición de los pies,
