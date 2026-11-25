@@ -131,12 +131,12 @@ BANDEJA_BORDE_POR_OBJETO = 0.08    # medias bandejas que se pierden de borde por
 BANDEJA_VEL_REPOSO = 0.02       # medias bandejas/s: por debajo y sin inclinación se para
 
 # Física de la cuerda floja (ángulo del funambulista en grados)
-CUERDA_GANANCIA = 600.0         # grados/s² por aw de balanceo
+CUERDA_GANANCIA = 900.0         # grados/s² por aw de balanceo (alta: en tándem la cadera apenas se puede mover)
 CUERDA_RIGIDEZ = 4.0            # 1/s², fuerza recuperadora hacia el centro
 CUERDA_AMORTIGUACION = 2.5      # 1/s, amortiguación de la velocidad angular
 CUERDA_ANGULO_MAX = 35.0        # grados, si se supera el funambulista cae
 CUERDA_ZONA_MUERTA = 0.012      # aw, zona muerta en la cuerda y la pelota (más fina: hay que corregir con precisión)
-CUERDA_TEMBLOR = 12.0           # grados/s², perturbación aleatoria cuando hay inestabilidad
+CUERDA_TEMBLOR = 8.0            # grados/s², perturbación aleatoria cuando hay inestabilidad
 CUERDA_TEMBLOR_TAU_S = 1.5      # s, lo que tarda el temblor en cambiar de lado
 CUERDA_AVISO_PELIGRO = 0.35     # fracción del ángulo máximo a partir de la que se indica hacia dónde corregir
 # Inestabilidad por nivel (clave "inestabilidad", 1/s²): por encima de CUERDA_RIGIDEZ el
@@ -151,7 +151,7 @@ UNA_PIERNA_RIESGO_S = 5.0       # s, por debajo: riesgo de caídas aumentado (or
 UNA_PIERNA_LEVANTADO = 0.25     # aw, diferencia de altura entre tobillos para dar el pie por levantado
 UNA_PIERNA_APOYADO = 0.10       # aw, por debajo de esta diferencia el pie ha vuelto al suelo (histéresis)
 UNA_PIERNA_APOYO_FRAMES = 4     # frames seguidos con el pie abajo para darlo por apoyado
-PELOTA_GANANCIA = 450.0         # grados/s² por aw: la pelota de la bailarina (más suave que la cuerda)
+PELOTA_GANANCIA = 650.0         # grados/s² por aw: la pelota de la bailarina (más suave que la cuerda)
 
 # ---------------------------------------------------------------------------
 # Marcha en el sitio (acto 4 «El Desfile» y prueba complementaria)
@@ -234,7 +234,7 @@ CANON_VUELO_S = 2.5             # s que dura la animación del disparo
 VIENTO_INTERVALO_S = (3.0, 6.0)     # s, rango aleatorio entre ráfagas
 VIENTO_DURACION_S = 1.5             # s, duración de cada ráfaga
 VIENTO_AVISO_S = 1.2                # s antes de una ráfaga en que se avisa (niveles con "aviso_viento")
-CRUZAR_PELIGRO_MAX = 0.30           # 0-1, en «Cruza la cuerda» el funambulista avanza si el peligro es menor
+CRUZAR_PELIGRO_MAX = 0.45           # 0-1, en «Cruza la cuerda» el funambulista avanza si el peligro es menor
 BURBUJA_INTERVALO_S = 2.5           # s entre burbujas
 BURBUJA_VIDA_S = 4.0                # s antes de que una burbuja desaparezca
 BURBUJA_RADIO = 0.045               # fracción del ancho de imagen
@@ -268,16 +268,16 @@ ACTOS = [
         "niveles": [
             # inestabilidad > CUERDA_RIGIDEZ (4): el funambulista se cae solo si no corriges con la cadera
             {"nombre": "Primeros pasos", "duracion_s": 10, "objetos": 1, "viento": 0.0, "burbujas": False,
-             "inestabilidad": 4.3},
+             "inestabilidad": 4.2},
             # cruzar: el funambulista solo avanza mientras está estable; hay que llegar al otro lado
             # (avance_s de estabilidad) antes de duracion_s; estrellas_s = tiempos para 1★, 2★, 3★
-            {"nombre": "Cruza la cuerda", "duracion_s": 35, "objetos": 1, "viento": 0.0, "burbujas": False,
-             "inestabilidad": 4.8, "cruzar": True, "avance_s": 15, "estrellas_s": (35, 25, 18)},
+            {"nombre": "Cruza la cuerda", "duracion_s": 40, "objetos": 1, "viento": 0.0, "burbujas": False,
+             "inestabilidad": 4.4, "cruzar": True, "avance_s": 12, "estrellas_s": (40, 22, 15)},
             # aviso_viento: flechas un segundo antes de cada ráfaga para anticiparse
-            {"nombre": "Vendaval", "duracion_s": 15, "objetos": 1, "viento": 45.0, "burbujas": False,
-             "inestabilidad": 4.5, "aviso_viento": True},
+            {"nombre": "Vendaval", "duracion_s": 15, "objetos": 1, "viento": 35.0, "burbujas": False,
+             "inestabilidad": 4.4, "aviso_viento": True},
             {"nombre": "Malabarista", "duracion_s": 20, "objetos": 1, "viento": 0.0, "burbujas": True,
-             "inestabilidad": 5.2},
+             "inestabilidad": 4.6},
         ],
     },
     {
@@ -287,11 +287,11 @@ ACTOS = [
         "niveles": [
             {"nombre": "Puntillas", "duracion_s": 8, "objetos": 1, "viento": 0.0, "burbujas": False},
             {"nombre": "A la pata coja", "duracion_s": 15, "objetos": 1, "viento": 0.0, "burbujas": False,
-             "inestabilidad": 4.3},
+             "inestabilidad": 4.2},
             {"nombre": "Brisa en la pista", "duracion_s": 12, "objetos": 1, "viento": 30.0, "burbujas": False,
-             "inestabilidad": 4.3, "aviso_viento": True},
+             "inestabilidad": 4.2, "aviso_viento": True},
             {"nombre": "Baile de burbujas", "duracion_s": 15, "objetos": 1, "viento": 0.0, "burbujas": True,
-             "inestabilidad": 4.6},
+             "inestabilidad": 4.4},
         ],
     },
     {

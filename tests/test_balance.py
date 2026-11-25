@@ -139,12 +139,12 @@ def test_fisica_independiente_de_los_fps():
 
 def test_cuerda_inestable_se_cae_sola_si_no_se_corrige():
     for semilla in range(5):
-        c = CuerdaFloja(inestabilidad=4.8, rng=np.random.default_rng(semilla))
+        c = CuerdaFloja(inestabilidad=4.6, rng=np.random.default_rng(semilla))
         assert simular(c, [0.0] * 30 * 25)
 
 
 def test_cuerda_inestable_se_mantiene_corrigiendo():
-    c = CuerdaFloja(inestabilidad=5.2, zona=C.CUERDA_ZONA_MUERTA, rng=np.random.default_rng(0))
+    c = CuerdaFloja(inestabilidad=4.6, zona=C.CUERDA_ZONA_MUERTA, rng=np.random.default_rng(0))
     for _ in range(30 * 20):
         assert not c.actualizar(-0.01 * c.angulo, DT)
     assert c.correccion in (-1, 0, 1)
