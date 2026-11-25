@@ -6,7 +6,7 @@ import numpy as np
 import config as C
 from core.gestures import manos_px
 from scenes.base import SALIR, Scene, Transicion
-from ui.dwell_button import MenuDwell, dibujar_manos
+from ui.dwell_button import BotonDwell, MenuDwell, dibujar_manos
 from ui.hud import titulo
 from ui.text import panel, texto
 
@@ -32,6 +32,8 @@ class EscenaMenu(Scene):
             ("Salir", "salir"),
         ]
         self.menu = MenuDwell.laterales(opciones, ancho, alto)
+        t, m = C.MENU_TROFEO_TAM, C.MENU_TROFEO_MARGEN      # trofeo pequeño, sin texto, abajo a la derecha
+        self.menu.botones.append(BotonDwell((ancho - m - t, alto - m - t, t, t), "", "logros", icono="trofeo"))
 
     def update(self, pose, dt) -> Transicion:
         super().update(pose, dt)
@@ -67,6 +69,9 @@ class EscenaMenu(Scene):
             return EscenaHistorial(self.ctx)
         if accion == "jugador":
             return EscenaJugador(self.ctx)
+        if accion == "logros":
+            from scenes.achievements_scene import EscenaLogros
+            return EscenaLogros(self.ctx)
         if accion == "ajustes":
             from scenes.settings_scene import EscenaAjustes
             return EscenaAjustes(self.ctx)

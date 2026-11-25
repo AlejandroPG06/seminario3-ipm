@@ -53,6 +53,13 @@ class BotonDwell:
             cv2.rectangle(frame, (x, y), (x + w, y + h), color, -1)
             borde = C.DORADO if (self.encima or self.seleccionado) else C.BLANCO
             cv2.rectangle(frame, (x, y), (x + w, y + h), borde, 3)
+        if not self.etiqueta and self.icono and sprites is not None:      # botón solo con icono
+            sprites.icono(frame, self.icono, (x + w // 2, y + h // 2), min(w, h) * 0.62)
+            if self.progreso > 0:
+                r = min(w, h) // 2 - 6
+                cv2.ellipse(frame, (x + w // 2, y + h // 2), (r, r), -90, 0, 360 * self.progreso,
+                            C.AMARILLO, 6, cv2.LINE_AA)
+            return
         color_txt = C.BLANCO if self.activo else (200, 200, 200)
         segunda = bool(self.subtitulo) or self.estrellas is not None
         tam = self.tam if not segunda else self.tam - 4

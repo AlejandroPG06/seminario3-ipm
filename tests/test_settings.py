@@ -158,3 +158,45 @@ def test_el_esqueleto_se_dibuja_en_todas_las_escenas(ctx):
     ctx.ajustes.esqueleto = False
     sin = m.fondo(frame_negro())
     assert (sin == C.ESQUELETO_COLOR).all(axis=2).sum() == 0
+
+
+# -- Logros ------------------------------------------------------------------------------
+
+def test_progreso_de_los_logros():
+    from games.achievements import progreso_logro
+    logros = {l["id"]: l for l in C.LOGROS}
+    assert progreso_logro(logros["constancia"], {"sesiones": 3}) == "Llevas 3 de 5"
+    assert progreso_logro(logros["pulso_acero"], {"racha_max_s": 7.43}) == "Llevas 7,4 de 10"
+    assert "12,30" in progreso_logro(logros["muelle_humano"], {"silla_mejor_s": 12.3})
+    assert progreso_logro(logros["flamenco"], {"una_pierna_max_s": None}) == ""
+
+
+def test_trofeo_del_menu_abre_los_logros(ctx):
+    from scenes.menu import EscenaMenu
+    m = EscenaMenu(ctx)
+    m.draw(frame_negro())
+    trofeo = next(b for b in m.menu.botones if b.accion == "logros")
+    x, y, w, h = trofeo.rect
+    assert trofeo.etiqueta == "" and x + w > ANCHO * 0.9 and y + h > ALTO * 0.9   # abajo a la derecha
+    e = m._ejecutar("logros")
+    assert type(e).__name__ == "EscenaLogros"
+
+
+def test_pantalla_de_logros(ctx):
+    from scenes.achievements_scene import EscenaLogros
+    p = ctx.perfil()
+    p["logros"] = ["primera_funcion"]
+    ctx.almacen.guardar_perfil(p)
+    e = EscenaLogros(ctx)
+    e.draw(frame_negro())
+    assert e.conseguidos == {"primera_funcion"}
+    e.on_key("derecha")
+    e.on_key("abajo")
+    assert e.indice == 1 + 4
+    x, y, w, h = e.rects[7]                               # señalar un logro lo elige al momento
+    pose = pose_de_pie()
+    pose.lm[C.INDICE_DER, 0], pose.lm[C.INDICE_DER, 1] = (x + w / 2) / ANCHO, (y + h / 2) / ALTO
+    e.update(pose, 1 / 30)
+    assert e.indice == 7
+    e.draw(frame_negro())
+    assert type(e.on_key("esc")).__name__ == "EscenaMenu"

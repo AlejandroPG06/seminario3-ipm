@@ -182,8 +182,11 @@ En `data/` (no se sube al repositorio):
 - `historial.csv`: una fila por sesión, con la fecha, el modo, los tiempos de cada prueba, los puntos SPPB, los puntos de juego y las estrellas.
 - `ajustes.json`: música, volumen, fondo, animaciones, detección y el **último jugador elegido**, que se carga solo al abrir el juego.
 
-En la pantalla **Historial** se ven el ranking local, los logros y la gráfica
-de evolución de la SPPB.
+En la pantalla **Historial** se ven el ranking local y la gráfica de evolución
+de la SPPB. Los **logros** tienen su propia pantalla, a la que se entra con el
+trofeo de la esquina inferior derecha del menú: los conseguidos salen en verde y
+los pendientes en gris. Al señalar uno con la mano (o elegirlo con las flechas)
+se explica cómo se consigue y cuánto llevas.
 
 ## Personalización
 

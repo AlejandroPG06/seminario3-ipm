@@ -321,13 +321,12 @@ def ranking(perfiles: dict, n: int = 5) -> list[tuple[str, int]]:
 
 
 class EscenaHistorial(_EscenaConMenu):
-    """Ranking local, logros del jugador y gráfica de evolución de la SPPB."""
+    """Ranking local y gráfica de evolución de la SPPB (los logros tienen su propia pantalla)."""
 
     def __init__(self, ctx):
         super().__init__(ctx)
         self.grafica: np.ndarray | None = None
         self.ranking: list[tuple[str, int]] = []
-        self.logros: list[str] = []
         self.n_sesiones = 0
 
     def enter(self) -> None:
@@ -335,7 +334,6 @@ class EscenaHistorial(_EscenaConMenu):
         self.n_sesiones = len(filas)
         self._filas = filas
         self.ranking = ranking(self.ctx.almacen.todos_los_perfiles())
-        self.logros = self.ctx.perfil().get("logros", [])
 
     def opciones(self) -> list[tuple[str, str]]:
         return [("Volver", "menu")]
@@ -349,7 +347,7 @@ class EscenaHistorial(_EscenaConMenu):
         frame = self.fondo(frame)
         H, W = frame.shape[:2]
         if self.grafica is None:
-            self.grafica = grafica_sppb(self._filas, ancho=max(300, min(520, W - 770)))
+            self.grafica = grafica_sppb(self._filas, ancho=max(300, min(800, W - 420)), alto=420)
         titulo(frame, f"Historial de {self.ctx.jugador}", 20)
         texto(frame, f"Sesiones jugadas: {self.n_sesiones}", (W // 2, 88), C.TAM_PEQUENO, C.BLANCO, "centro")
         # Ranking
@@ -360,18 +358,10 @@ class EscenaHistorial(_EscenaConMenu):
             color = C.AMARILLO if nombre == self.ctx.jugador else C.BLANCO
             texto(frame, f"{i + 1}. {nombre[:14]}", (x0 + 15, y0 + 55 + i * 40), C.TAM_PEQUENO, color)
             texto(frame, str(pts), (x0 + 315, y0 + 55 + i * 40), C.TAM_PEQUENO, color, "der")
-        # Logros
-        x1 = 400
-        panel(frame, x1, 125, x1 + 330, 125 + 55 + 33 * len(C.LOGROS), alfa=0.75)
-        texto(frame, "Logros", (x1 + 15, 135), C.TAM_TEXTO - 4, C.DORADO)
-        for i, l in enumerate(C.LOGROS):
-            tiene = l["id"] in self.logros
-            texto(frame, "• " + l["nombre"], (x1 + 15, 178 + i * 33), C.TAM_PEQUENO - 2,
-                  C.VERDE if tiene else C.GRIS)
-        # Gráfica
+        # Gráfica (a la derecha del ranking)
         if self.grafica is not None:
             g = self.grafica
-            gx = min(W - g.shape[1] - 20, x1 + 350)
+            gx = min(W - g.shape[1] - 20, 400)
             gy = 125
             if gx >= 0 and gy + g.shape[0] <= H:
                 frame[gy:gy + g.shape[0], gx:gx + g.shape[1]] = g

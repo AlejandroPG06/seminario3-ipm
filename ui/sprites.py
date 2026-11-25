@@ -290,9 +290,34 @@ class Sprites:
                 pts.append((cx + radio * math.cos(a), cy + radio * math.sin(a)))
             _poli(frame, np.array(pts), C.CREMA_CARPA)
             cv2.circle(frame, (int(cx), int(cy)), max(2, int(r * 0.32)), C.ROJO_CARPA, -1, cv2.LINE_AA)
+        elif nombre == "trofeo":
+            self.trofeo(frame, (cx, cy), tam, C.DORADO)
         elif nombre == "info":
             cv2.circle(frame, (int(cx), int(cy)), int(r), C.CREMA_CARPA, -1, cv2.LINE_AA)
             texto(frame, "?", (int(cx), int(cy - r * 0.8)), int(tam * 0.8), C.ROJO_CARPA, "centro", sombra=False)
+
+    @staticmethod
+    def trofeo(frame, centro, tam: float, color=C.DORADO) -> None:
+        """Copa con dos asas, pie y peana."""
+        cx, cy = centro
+        s = tam / 2
+        g = max(2, int(tam * 0.07))
+        oscuro = tuple(int(v * 0.6) for v in color)
+        for lado in (-1, 1):       # asas
+            cv2.ellipse(frame, (int(cx + lado * s * 0.55), int(cy - s * 0.45)), (int(s * 0.3), int(s * 0.3)),
+                        0, 0, 360, color, g, cv2.LINE_AA)
+        copa = np.array([(cx - s * 0.62, cy - s * 0.85), (cx + s * 0.62, cy - s * 0.85),
+                         (cx + s * 0.5, cy - s * 0.2), (cx + s * 0.2, cy + s * 0.15),
+                         (cx - s * 0.2, cy + s * 0.15), (cx - s * 0.5, cy - s * 0.2)])
+        _poli(frame, copa, color)
+        cv2.rectangle(frame, (int(cx - s * 0.1), int(cy + s * 0.1)), (int(cx + s * 0.1), int(cy + s * 0.55)),
+                      color, -1, cv2.LINE_AA)
+        cv2.rectangle(frame, (int(cx - s * 0.45), int(cy + s * 0.55)), (int(cx + s * 0.45), int(cy + s * 0.85)),
+                      color, -1, cv2.LINE_AA)
+        cv2.line(frame, (int(cx - s * 0.25), int(cy - s * 0.7)), (int(cx - s * 0.15), int(cy - s * 0.25)),
+                 (255, 255, 255), max(1, g // 2), cv2.LINE_AA)     # brillo
+        cv2.rectangle(frame, (int(cx - s * 0.45), int(cy + s * 0.55)), (int(cx + s * 0.45), int(cy + s * 0.85)),
+                      oscuro, 1, cv2.LINE_AA)
 
     def estrella(self, frame, centro, radio: float, llena: bool = True) -> None:
         nombre = "estrella" if llena else "estrella_vacia"

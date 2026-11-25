@@ -50,6 +50,21 @@ def cumple(logro: dict, stats: dict) -> bool:
     return _OPERADORES[logro["op"]](valor, logro["valor"])
 
 
+def progreso_logro(logro: dict, stats: dict) -> str:
+    """Texto con lo que lleva el jugador hacia un logro («Llevas 3 de 5»), o "" si no hay dato."""
+    valor = stats.get(logro["clave"])
+    if valor is None:
+        return ""
+    objetivo = logro["valor"]
+    decimales = 2 if logro["op"] in ("<=", "<") else 1
+
+    def fmt(v: float) -> str:
+        return f"{int(v)}" if float(v).is_integer() else f"{v:.{decimales}f}".replace(".", ",")
+    if logro["op"] in ("<=", "<"):
+        return f"Tu mejor marca: {fmt(valor)} (objetivo: {fmt(objetivo)})"
+    return f"Llevas {fmt(min(valor, objetivo) if cumple(logro, stats) else valor)} de {fmt(objetivo)}"
+
+
 def nuevos_logros(stats: dict, ya_tenidos: list[str], logros: list[dict] = C.LOGROS) -> list[dict]:
     """Logros que se cumplen ahora y no se tenían."""
     return [l for l in logros if l["id"] not in ya_tenidos and cumple(l, stats)]

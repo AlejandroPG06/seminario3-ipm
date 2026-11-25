@@ -93,6 +93,8 @@ MENU_BOTON_ANCHO = 260          # px
 MENU_BOTON_ALTO = 84            # px
 MENU_FILAS_Y_4 = (0.17, 0.72)   # fracción del alto: zona de los botones cuando hay 4 filas por columna
 MENU_BOTON_ALTO_4 = 72          # px, alto de los botones cuando hay 4 filas por columna
+MENU_TROFEO_TAM = 84            # px, botón del trofeo (logros) en la esquina inferior derecha del menú
+MENU_TROFEO_MARGEN = 24         # px desde los bordes de la imagen
 BRAZOS_ARRIBA_S = 1.0           # s con las dos muñecas por encima de la nariz para el gesto
 BRAZOS_ARRIBA_MARGEN = 0.05     # fracción del alto de imagen por encima de la nariz
 
@@ -335,18 +337,30 @@ PRUEBAS_COMPLEMENTARIAS = ["una_pierna", "marcha"]
 # una_pierna_max_s, compas_max
 # ---------------------------------------------------------------------------
 LOGROS = [
-    {"id": "primera_funcion", "nombre": "Primera función", "descripcion": "Completa tu primera sesión", "clave": "sesiones", "op": ">=", "valor": 1},
-    {"id": "constancia", "nombre": "Constancia", "descripcion": "Juega 5 sesiones", "clave": "sesiones", "op": ">=", "valor": 5},
-    {"id": "pulso_acero", "nombre": "Pulso de acero", "descripcion": "Racha de 10 s muy estable", "clave": "racha_max_s", "op": ">=", "valor": 10},
-    {"id": "funambulista", "nombre": "Funambulista", "descripcion": "3 estrellas en La Cuerda Floja", "clave": "estrellas_acto_2", "op": ">=", "valor": 3},
-    {"id": "bailarina", "nombre": "Prima ballerina", "descripcion": "3 estrellas en La Bailarina", "clave": "estrellas_acto_3", "op": ">=", "valor": 3},
-    {"id": "flamenco", "nombre": "Flamenco", "descripcion": "Aguanta 30 s sobre una pierna", "clave": "una_pierna_max_s", "op": ">=", "valor": 30},
-    {"id": "tamborilero", "nombre": "Tamborilero", "descripcion": "40 pasos al compás en un desfile", "clave": "compas_max", "op": ">=", "valor": 40},
-    {"id": "muelle_humano", "nombre": "Muelle humano", "descripcion": "5 levantadas en 11,19 s o menos", "clave": "silla_mejor_s", "op": "<=", "valor": 11.19},
-    {"id": "gran_estreno", "nombre": "Gran estreno", "descripcion": "Desbloquea los 5 actos", "clave": "actos_desbloqueados", "op": ">=", "valor": 5},
-    {"id": "contra_viento", "nombre": "Contra el viento", "descripcion": "Supera un nivel con viento", "clave": "viento_superado", "op": ">=", "valor": 1},
-    {"id": "cazaburbujas", "nombre": "Cazaburbujas", "descripcion": "Toca 20 burbujas en total", "clave": "burbujas_total", "op": ">=", "valor": 20},
-    {"id": "sppb_perfecta", "nombre": "Estrella del circo", "descripcion": "Saca 8/8 en el Modo Evaluación", "clave": "sppb_max", "op": ">=", "valor": 8},
+    {"id": "primera_funcion", "nombre": "Primera función", "descripcion": "Completa tu primera sesión", "explicacion": "Termina cualquier sesión: una evaluación, un nivel de la Aventura o un ejercicio de Práctica.",
+     "clave": "sesiones", "op": ">=", "valor": 1},
+    {"id": "constancia", "nombre": "Constancia", "descripcion": "Juega 5 sesiones", "explicacion": "Juega 5 sesiones en cualquier modo. Practicar a menudo es lo que más mejora el equilibrio.",
+     "clave": "sesiones", "op": ">=", "valor": 5},
+    {"id": "pulso_acero", "nombre": "Pulso de acero", "descripcion": "Racha de 10 s muy estable", "explicacion": "En un nivel de equilibrio de la Aventura, aguanta 10 segundos seguidos casi sin balancearte.",
+     "clave": "racha_max_s", "op": ">=", "valor": 10},
+    {"id": "funambulista", "nombre": "Funambulista", "descripcion": "3 estrellas en La Cuerda Floja", "explicacion": "Consigue 3 estrellas en un nivel del acto 2, La Cuerda Floja (tándem).",
+     "clave": "estrellas_acto_2", "op": ">=", "valor": 3},
+    {"id": "bailarina", "nombre": "Prima ballerina", "descripcion": "3 estrellas en La Bailarina", "explicacion": "Consigue 3 estrellas en un nivel del acto 3, La Bailarina (sobre una pierna).",
+     "clave": "estrellas_acto_3", "op": ">=", "valor": 3},
+    {"id": "flamenco", "nombre": "Flamenco", "descripcion": "Aguanta 30 s sobre una pierna", "explicacion": "Aguanta 30 segundos sobre una pierna en la Evaluación o en la Práctica.",
+     "clave": "una_pierna_max_s", "op": ">=", "valor": 30},
+    {"id": "tamborilero", "nombre": "Tamborilero", "descripcion": "40 pasos al compás en un desfile", "explicacion": "En El Desfile, da 40 pasos siguiendo el ritmo del tambor en un mismo nivel.",
+     "clave": "compas_max", "op": ">=", "valor": 40},
+    {"id": "muelle_humano", "nombre": "Muelle humano", "descripcion": "5 levantadas en 11,19 s o menos", "explicacion": "Haz las 5 levantadas de la silla en 11,19 s o menos (la máxima puntuación de la SPPB).",
+     "clave": "silla_mejor_s", "op": "<=", "valor": 11.19},
+    {"id": "gran_estreno", "nombre": "Gran estreno", "descripcion": "Desbloquea los 5 actos", "explicacion": "Desbloquea los 5 actos de la Aventura consiguiendo estrellas en cada uno.",
+     "clave": "actos_desbloqueados", "op": ">=", "valor": 5},
+    {"id": "contra_viento", "nombre": "Contra el viento", "descripcion": "Supera un nivel con viento", "explicacion": "Supera, con al menos 1 estrella, un nivel de la Aventura que tenga ráfagas de viento.",
+     "clave": "viento_superado", "op": ">=", "valor": 1},
+    {"id": "cazaburbujas", "nombre": "Cazaburbujas", "descripcion": "Toca 20 burbujas en total", "explicacion": "Toca 20 burbujas en total en los niveles de doble tarea de la Aventura.",
+     "clave": "burbujas_total", "op": ">=", "valor": 20},
+    {"id": "sppb_perfecta", "nombre": "Estrella del circo", "descripcion": "Saca 8/8 en el Modo Evaluación", "explicacion": "Consigue la puntuación máxima, 8 de 8, en el Modo Evaluación.",
+     "clave": "sppb_max", "op": ">=", "valor": 8},
 ]
 
 # ---------------------------------------------------------------------------
