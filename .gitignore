@@ -1,0 +1,20 @@
+*.task
+mp_env/
+
+# Modelos descargados
+models/
+
+# Datos de jugadores (perfiles e historial), salvo el marcador
+data/*
+!data/.gitkeep
+
+# Vídeos de prueba
+samples/
+
+# Sonidos generados por tools/generate_assets.py
+assets/sounds/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
