@@ -30,6 +30,7 @@ TECLAS_ESPECIALES = {
     2424832: "izquierda", 2490368: "arriba", 2555904: "derecha", 2621440: "abajo",
     13: "enter", 10: "enter", 27: "esc", 8: "retroceso", 127: "retroceso", 65288: "retroceso",
     65293: "enter", 65307: "esc",
+    65480: "f11", 7995392: "f11",        # F11 en Linux (Qt/GTK) y en Windows
 }
 
 
@@ -66,6 +67,7 @@ def argumentos(argv=None) -> argparse.Namespace:
     p.add_argument("--sin-sonido", action="store_true", help="desactiva el audio")
     p.add_argument("--sin-musica", action="store_true", help="empieza con la música apagada (tecla M)")
     p.add_argument("--sin-fondo", action="store_true", help="no sustituye el fondo por la carpa")
+    p.add_argument("--pantalla-completa", action="store_true", help="empieza a pantalla completa (F11 la alterna)")
     return p.parse_args(argv)
 
 
@@ -144,7 +146,8 @@ def main(argv=None) -> int:
     ctx.audio.permitir_musica(escena.con_musica)
     ctx.audio.poner_pista(escena.pista_musica)
     if not args.headless:
-        cv2.namedWindow(C.VENTANA_NOMBRE, cv2.WINDOW_NORMAL)
+        from ui.ventana import Ventana
+        ventana = Ventana(C.VENTANA_NOMBRE, args.pantalla_completa)
     anterior = time.monotonic()
     fps = 0.0
     n = 0
@@ -175,14 +178,17 @@ def main(argv=None) -> int:
             if args.debug:
                 dibujar_debug(salida, escena, pose, fps)
             if not args.headless:
-                cv2.imshow(C.VENTANA_NOMBRE, salida)
+                ventana.mostrar(salida)
                 tecla = traducir_tecla(cv2.waitKeyEx(1))
+                if tecla == "f11":
+                    ventana.alternar()
+                    tecla = None
                 if tecla is not None and siguiente is None:
                     siguiente = escena.on_key(tecla)
                     if tecla == "m" and siguiente is None and not getattr(escena, "escribiendo", False):
                         ajustes.musica = not ajustes.musica
                         ctx.guardar_ajustes()
-                if cv2.getWindowProperty(C.VENTANA_NOMBRE, cv2.WND_PROP_VISIBLE) < 1:
+                if ventana.cerrada():
                     break
             if siguiente == SALIR:
                 break

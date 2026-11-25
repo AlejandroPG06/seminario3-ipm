@@ -141,6 +141,7 @@ python main.py
 | `--jugador NOMBRE` | Empieza con ese jugador (por defecto, el último que se eligió en el juego) |
 | `--headless --frames N` | Ejecuta N frames sin abrir ventana (prueba de humo) |
 | `--sin-sonido`, `--sin-musica`, `--sin-fondo` | Desactivan el audio, empiezan sin música o quitan el fondo de carpa (solo en esa sesión) |
+| `--pantalla-completa` | Empieza a pantalla completa (F11 la activa o desactiva en cualquier momento) |
 | `--datos CARPETA` | Carpeta de perfiles e historial (por defecto, `data/`) |
 
 ### Colocación de la cámara
@@ -176,6 +177,10 @@ El teclado sirve como alternativa de accesibilidad y para depurar:
 | P | Pausar o reanudar |
 | F | Marcar a mano una pérdida de equilibrio (para quien evalúa) |
 | M | Activar o desactivar la música |
+| F11 | Pantalla completa (también `--pantalla-completa`) |
+
+En Linux la ventana sale grande, ajustada a la pantalla y sin las barras que OpenCV
+añade con Qt. En cualquier sistema, F11 pone o quita la pantalla completa.
 
 ### Ajustes
 

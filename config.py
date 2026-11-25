@@ -24,6 +24,7 @@ AJUSTES_ARCHIVO = "ajustes.json"        # dentro de DATA_DIR: volumen, fondo, an
 # Ventana y cámara
 # ---------------------------------------------------------------------------
 VENTANA_NOMBRE = "El Gran Circo del Equilibrio"
+VENTANA_FRACCION_PANTALLA = 0.88    # Linux (Qt): la ventana ocupa como mucho esta fracción de la pantalla (F11: completa)
 CAMARA_ANCHO_PEDIDO = 1280      # px, resolución que se pide a la webcam
 CAMARA_ALTO_PEDIDO = 720        # px
 CAMARA_FORMATO = "MJPG"         # fourcc pedido a la webcam: MJPG va comprimido (mejor por USB/usbipd); "" = el de la cámara

@@ -135,3 +135,11 @@ def test_rutas_con_caracteres_no_ascii(tmp_path):
         det = DetectorPose(str(modelo))
         assert det.detectar(np.zeros((360, 640, 3), np.uint8)) is None
         det.cerrar()
+
+
+def test_encajar_en_pantalla():
+    from ui.ventana import encajar
+    img = np.zeros((720, 1280, 3), np.uint8)
+    assert encajar(img, 1920, 1080, rellenar=True).shape == (1080, 1920, 3)
+    assert encajar(img, 1920, 1200, rellenar=True).shape == (1200, 1920, 3)      # 16:10 con bandas negras
+    assert encajar(img, 1689, 950, rellenar=False).shape[:2] == (950, 1688)
