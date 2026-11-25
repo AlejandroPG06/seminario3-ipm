@@ -94,7 +94,7 @@ def test_consejos():
     assert any("pies" in c for c in consejos("tandem", {"motivo": "Has movido los pies", "balanceo_medio": 0.0}))
     assert any("derecha" in c for c in consejos("pies_juntos", {"motivo": "", "balanceo_signo": 0.1}))
     assert any("manos" in c for c in consejos("silla", {"manos": True, "incompletas": 0, "tiempo": 10}))
-    assert consejos("pies_juntos", {"motivo": "¡Conseguido!"}) == ["¡Muy bien! Repite para afianzarlo."]
+    assert consejos("pies_juntos", {"motivo": "¡Conseguido!", "tiempo": 10.0}) == ["¡Muy bien! Repite para afianzarlo."]
     assert len(consejos("silla", {"manos": True, "incompletas": 2, "tiempo": 20})) <= 3
 
 

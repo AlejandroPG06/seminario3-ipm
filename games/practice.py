@@ -48,6 +48,10 @@ def consejos(prueba: str, res: dict) -> list[str]:
             lista.append(f"Tiendes a irte hacia tu {lado}: reparte el peso.")
         elif res.get("balanceo_medio", 0.0) > C.MULTIPLICADORES_ESTABILIDAD[1][0]:
             lista.append("Te balanceas bastante: contrae el abdomen y respira tranquilo.")
+    from games.tips import objetivo_practica
+    objetivo = objetivo_practica(prueba, res)
+    if objetivo:
+        lista.insert(0, objetivo)
     if not lista:
         lista.append("¡Muy bien! Repite para afianzarlo.")
     return lista[:3]

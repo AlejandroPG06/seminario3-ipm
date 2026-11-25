@@ -78,6 +78,12 @@ cerca que estuvo de caerse: 3 estrellas si siempre se mantuvo cerca del centro
 de caerse. Durante el nivel, el marcador **"En juego"** muestra las estrellas que
 aún se pueden conseguir. En la marcha cuentan los pasos y en la silla, el tiempo.
 
+**Consejos de mejora**: al terminar cualquier ejercicio el juego dice qué hacer a
+continuación. En la Aventura, si fallas, qué hace falta para conseguir al menos 1
+estrella y, con 1 o 2, qué hace falta para la siguiente (por ejemplo, "Para 3
+estrellas, hazlas en 11,19 s o menos"). En la Práctica, el siguiente objetivo de
+puntos SPPB. En la Evaluación, qué prueba conviene entrenar en el Modo Práctica.
+
 **Puntos**: se ganan por cada segundo aguantado, multiplicados por la
 estabilidad (×2 "pulso de acero" con balanceo muy bajo) y por la racha de
 segundos estables. En la silla, cada levantada se valora como Perfecta, Buena o

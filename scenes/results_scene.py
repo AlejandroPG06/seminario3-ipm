@@ -14,6 +14,8 @@ from scenes.base import Scene, Transicion
 from scenes.menu import ALIAS_TECLAS
 from ui.dwell_button import MenuDwell, dibujar_manos
 from ui.hud import titulo
+from games.practice import MAXIMOS_SPPB
+from games.tips import consejo_evaluacion, consejos_nivel
 from ui.particles import Confeti
 from ui.text import panel, parrafo, texto
 
@@ -102,6 +104,8 @@ class EscenaResultadosNivel(_EscenaConMenu):
         self.logros = logros
         self.record = record
         self.siguiente = flujo.hay_siguiente(acto_id, n_nivel)
+        acto = C.ACTOS[acto_id - 1]
+        self.consejos = consejos_nivel(acto, acto["niveles"][n_nivel - 1], res, estrellas)
         self.t = 0.0
         self.mostradas = 0
         self.confeti = Confeti(ctx.semilla, ctx.animaciones)
@@ -151,16 +155,6 @@ class EscenaResultadosNivel(_EscenaConMenu):
                 lineas.append(f"Al compás: {r['al_compas']} de {r['pasos']}")
         else:
             lineas.append(f"{r['motivo']} · {r['tiempo']:.1f} s")
-            if r.get("cruzar"):
-                nivel = acto["niveles"][self.n_nivel - 1]
-                if not r.get("completado"):
-                    lineas.append(f"Llegaste al {r.get('avance', 0.0) * 100:.0f} % de la cuerda")
-                elif self.estrellas < 3:
-                    lineas.append(f"Para 3 estrellas, cruza en menos de {nivel['estrellas_s'][2]:.0f} s")
-            elif r.get("completado") and self.estrellas < 3:
-                cosa = {"cuerda": "El funambulista", "pelota": "La bailarina"}.get(acto["mecanica"], "El vaso")
-                lineas.append(f"{cosa} llegó al {r.get('peligro_max', 0.0) * 100:.0f} % de caerse: "
-                              "¡mantenlo en el centro para más estrellas!")
             lineas.append(f"Racha máxima: {r['racha_max_s']:.1f} s")
         if r.get("burbujas"):
             lineas.append(f"Burbujas: {r['burbujas']}")
@@ -181,8 +175,11 @@ class EscenaResultadosNivel(_EscenaConMenu):
             self.ctx.sprites.estrella(frame, (W // 2 - 100 + k * 100, 175), 40, k < self.mostradas)
         y = 235
         for linea in self._lineas():
-            y = parrafo(frame, linea, W // 2, y, C.TAM_TEXTO - 6, C.BLANCO, x1 - x0 - 24) + 4
-        dibujar_logros_nuevos(frame, self.logros[:2], y + 14, x1 - x0 - 24)
+            y = parrafo(frame, linea, W // 2, y, C.TAM_TEXTO - 8, C.BLANCO, x1 - x0 - 24) + 2
+        y += 6
+        for c in self.consejos:          # qué hacer para conseguir (más) estrellas
+            y = parrafo(frame, c, W // 2, y, C.TAM_PEQUENO, C.AMARILLO, x1 - x0 - 24) + 4
+        dibujar_logros_nuevos(frame, self.logros[:1], y + 8, x1 - x0 - 24)
         self.dibujar_menu(frame)
         self.confeti.dibujar(frame)
         return frame
@@ -246,6 +243,8 @@ class EscenaResultadosEvaluacion(_EscenaConMenu):
                 desc = f"{int(v)} pasos (rodilla dcha.)" if v is not None else "no completada"
                 y = parrafo(frame, f"Marcha {C.MARCHA_EVAL_S:.0f} s: {desc}", W // 2, y, C.TAM_PEQUENO - 2, C.BLANCO, ancho)
                 y = parrafo(frame, comp["marcha"]["texto"], W // 2, y, C.TAM_PEQUENO - 6, C.CREMA_CARPA, ancho)
+        y = parrafo(frame, consejo_evaluacion(self.res["puntos"], MAXIMOS_SPPB), W // 2, y + 6,
+                    C.TAM_PEQUENO - 2, C.AMARILLO, ancho)
         y = parrafo(frame, "SPPB reducida (sin marcha de 4 m). Orientativa: no es un diagnóstico.",
                     W // 2, y + 6, C.TAM_PEQUENO - 8, C.GRIS, ancho)
         dibujar_logros_nuevos(frame, self.logros[:1], y + 6, ancho)
