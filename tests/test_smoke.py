@@ -309,7 +309,7 @@ def test_aventura_desfile(ctx, nivel):
     e.draw(frame_negro())
 
 
-@pytest.mark.parametrize("nivel", [1, 3, 4])
+@pytest.mark.parametrize("nivel", [1, 3])
 def test_aventura_canon(ctx, nivel):
     from scenes.flows import FlujoAventura
     e = FlujoAventura(ctx).jugar(5, nivel)
@@ -455,3 +455,30 @@ def test_cruza_la_cuerda(ctx):
     assert niv["avance_s"] - 0.1 <= e.res["tiempo"] < niv["duracion_s"]
     assert e.estrellas >= 2                                   # el jugador sintético corrige bien
     e.draw(frame_negro())
+
+
+# -- El Hombre Bala, nivel 4: al ritmo del cañón ------------------------------------------
+
+def _nivel_ritmo(ctx):
+    from scenes.flows import FlujoAventura
+    e = FlujoAventura(ctx).jugar(5, 4)
+    e = ejecutar(e, lambda t: pose_sentado_lado(90), C.ENCUADRE_OK_S + C.CALIB_DURACION_S + 1)
+    assert nombre(e) == "EscenaSilla" and e.ritmo is not None
+    return tecla(e, "enter")
+
+
+def test_canon_al_ritmo_tres_estrellas(ctx):
+    e = _nivel_ritmo(ctx)
+    periodo = C.ACTOS[4]["niveles"][3]["ritmo_s"]
+    # de pie (pico del ciclo) justo en cada golpe: t de juego = periodo, 2·periodo…
+    e = ejecutar(e, silla_ciclos(periodo, C.SILLA_CUENTA_ATRAS_S + periodo / 2),
+                 C.SILLA_CUENTA_ATRAS_S + periodo * 6 + C.CANON_VUELO_S + 5, dibujar_cada=3)
+    assert nombre(e) == "EscenaResultadosNivel"
+    assert e.res["repeticiones"] == 5 and e.res["fuera_ritmo"] == 0 and e.estrellas == 3
+
+
+def test_canon_fuera_de_ritmo_no_cuenta(ctx):
+    e = _nivel_ritmo(ctx)
+    e = ejecutar(e, silla_ciclos(2.0, C.SILLA_CUENTA_ATRAS_S), C.SILLA_CUENTA_ATRAS_S + 20, dibujar_cada=3)
+    assert nombre(e) == "EscenaSilla" and e.fuera_ritmo >= 2          # a su aire: varias no valen
+    assert e.contador.cuenta < 5 + e.fuera_ritmo

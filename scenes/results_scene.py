@@ -147,8 +147,11 @@ class EscenaResultadosNivel(_EscenaConMenu):
             else:
                 lineas.append(f"{r['repeticiones']}/{r['objetivo']} levantadas: se acabó el tiempo")
             calidades = [rep.calidad for rep in r["reps"]]
-            lineas.append(f"Perfectas {calidades.count('Perfecta')} · Buenas {calidades.count('Buena')}"
-                          + (" · Con manos" if r["manos"] else ""))
+            if r.get("ritmo"):
+                lineas.append(f"Al ritmo: {len(calidades)} · Fuera de ritmo: {r.get('fuera_ritmo', 0)}")
+            else:
+                lineas.append(f"Perfectas {calidades.count('Perfecta')} · Buenas {calidades.count('Buena')}"
+                              + (" · Con manos" if r["manos"] else ""))
         elif r["prueba"] == "marcha":
             lineas.append(f"{r['pasos']} pasos en {r['tiempo']:.0f} s")
             if acto["niveles"][self.n_nivel - 1].get("tempo_bpm"):

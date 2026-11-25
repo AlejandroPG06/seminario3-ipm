@@ -177,6 +177,7 @@ SILLA_ANGULO_SUBIENDO = 125.0   # grados: desde «sentado», por encima empieza 
 SILLA_ANGULO_BAJANDO = 150.0    # grados: desde «de pie», por debajo empieza «bajando»
 SILLA_SUBIDA_PERFECTA_S = 1.5   # s, subida igual o más rápida y sin manos = «Perfecta»
 SILLA_MANOS_RODILLA_MAX = 0.35  # longitudes de muslo: muñeca más cerca de la rodilla = apoyo
+SILLA_RITMO_TOLERANCIA_S = 0.6  # s, «Al ritmo del cañón»: margen para estar de pie respecto al golpe de tambor
 SILLA_CUENTA_ATRAS_S = 5.0      # s para sentarse y cruzar los brazos tras dar la orden
 
 # ---------------------------------------------------------------------------
@@ -314,7 +315,10 @@ ACTOS = [
             {"nombre": "Carga básica", "repeticiones": 5, "tiempo_limite_s": 60, "estrellas_s": (60, 16.69, 13.69), "manos_falla": False},
             {"nombre": "Doble carga", "repeticiones": 8, "tiempo_limite_s": 60, "estrellas_s": (60, 26.0, 21.0), "manos_falla": False},
             {"nombre": "Carga exprés", "repeticiones": 5, "tiempo_limite_s": 30, "estrellas_s": (30, 13.69, 11.19), "manos_falla": False},
-            {"nombre": "Sin manos", "repeticiones": 5, "tiempo_limite_s": 60, "estrellas_s": (60, 16.69, 13.69), "manos_falla": True},
+            # ritmo_s: un golpe de tambor cada ritmo_s s; solo cuentan las levantadas que acaban de pie
+            # en el golpe (± SILLA_RITMO_TOLERANCIA_S). estrellas_fallos = fuera de ritmo máx. para 1★, 2★, 3★
+            {"nombre": "Al ritmo del cañón", "repeticiones": 5, "tiempo_limite_s": 60, "estrellas_s": (60, 16.69, 13.69),
+             "manos_falla": True, "ritmo_s": 3.0, "estrellas_fallos": (99, 2, 0)},
         ],
     },
 ]

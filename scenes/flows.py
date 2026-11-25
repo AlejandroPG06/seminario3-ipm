@@ -196,6 +196,10 @@ class FlujoAventura:
 
     def calcular_estrellas(self, acto: dict, nivel: dict, res: dict) -> int:
         if acto["mecanica"] == "canon":
+            if nivel.get("ritmo_s"):          # «Al ritmo del cañón»: estrellas por levantadas fuera de ritmo
+                if not res.get("completado"):
+                    return 0
+                return sum(1 for maximo in nivel["estrellas_fallos"] if res.get("fuera_ritmo", 0) <= maximo)
             return estrellas_silla(res.get("tiempo"), tuple(nivel["estrellas_s"]))
         if acto["mecanica"] == "tambor":
             return estrellas_marcha(res["pasos"], tuple(nivel["estrellas_pasos"]))
@@ -225,7 +229,7 @@ class FlujoAventura:
         fila = {"jugador": self.ctx.jugador, "modo": "aventura", "prueba": acto["prueba"],
                 "acto": acto_id, "nivel": n_nivel, "puntos": res["puntos"], "estrellas": estrellas,
                 "racha_max_s": f"{res.get('racha_max_s', 0):.1f}"}
-        if acto["mecanica"] != "tambor":     # los pasos de la Aventura no son comparables con la prueba de la Evaluación
+        if acto["mecanica"] != "tambor" and not nivel.get("ritmo_s"):   # no comparables con la Evaluación
             fila.update(fila_resultado(acto["prueba"], res))
         self.ctx.almacen.registrar_sesion(fila)
         nuevos = actualizar_logros(self.ctx, perfil)

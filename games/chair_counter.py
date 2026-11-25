@@ -2,6 +2,9 @@
 
 SENTADO → SUBIENDO → DE_PIE → BAJANDO → SENTADO. Una repetición cuenta al
 llegar a DE_PIE habiendo partido de SENTADO.
+
+`Ritmo` sirve para el nivel «Al ritmo del cañón»: un golpe de tambor cada
+`periodo` s y solo valen las levantadas que acaban (de pie) cerca de un golpe.
 """
 from __future__ import annotations
 
@@ -79,6 +82,15 @@ class ContadorSilla:
                 self.estado = DE_PIE
         return None
 
+    def anular_ultima(self, calidad: str = "Fuera de ritmo") -> Repeticion | None:
+        """Pasa la última repetición válida a incompletas (p. ej. si no iba al ritmo)."""
+        if not self.repeticiones:
+            return None
+        rep = self.repeticiones.pop()
+        rep.calidad = calidad
+        self.incompletas.append(rep)
+        return rep
+
     def _cerrar_repeticion(self) -> Repeticion:
         dur = self.t - self._t_inicio_subida
         if self._manos and self.manos_invalida:
@@ -89,3 +101,27 @@ class ContadorSilla:
         rep = Repeticion(dur, self._manos, calidad, self.t)
         self.repeticiones.append(rep)
         return rep
+
+
+class Ritmo:
+    """Golpes de tambor cada `periodo` s (el primero en t = periodo) con una tolerancia (s)."""
+
+    def __init__(self, periodo: float, tolerancia: float = C.SILLA_RITMO_TOLERANCIA_S):
+        self.periodo = periodo
+        self.tolerancia = tolerancia
+
+    def desfase(self, t: float) -> float:
+        """Segundos con signo hasta el golpe más cercano (negativo = antes del golpe)."""
+        k = max(1, round(t / self.periodo))
+        return t - k * self.periodo
+
+    def al_ritmo(self, t: float) -> bool:
+        return abs(self.desfase(t)) <= self.tolerancia
+
+    def fase(self, t: float) -> float:
+        """0-1: cuánto falta para el próximo golpe (1 = justo en el golpe)."""
+        return (t % self.periodo) / self.periodo
+
+    def golpe(self, t_anterior: float, t: float) -> bool:
+        """True si entre t_anterior y t ha sonado un golpe."""
+        return int(t // self.periodo) > int(t_anterior // self.periodo) and t >= self.periodo

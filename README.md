@@ -54,7 +54,7 @@ Hay tres modos:
 | 2. La Cuerda Floja | Tándem | El funambulista se cae solo si no lo corriges: una flecha indica hacia dónde mover la cadera |
 | 3. La Bailarina | Sobre una pierna | Una bailarina sobre una pelota que rueda con tu balanceo; si apoyas el pie, se cae |
 | 4. El Desfile | Marcha en el sitio | Cada paso con la rodilla hasta la línea toca el tambor; bonus por ir al compás |
-| 5. El Hombre Bala | 5 levantadas de la silla | Cada levantada carga el cañón; cuanto más rápido, más lejos vuelas |
+| 5. El Hombre Bala | 5 levantadas de la silla | Cada levantada carga el cañón; cuanto más rápido, más lejos vuelas. En el nivel 4, *Al ritmo del cañón*, suena un tambor cada 3 s y solo cuentan las levantadas que acaban de pie justo en el golpe |
 
 El semitándem no tiene acto propio, pero se puede entrenar en el Modo Práctica.
 Cada acto tiene 4 niveles: la prueba tal cual, una versión más difícil, una con

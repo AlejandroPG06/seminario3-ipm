@@ -9,6 +9,10 @@ from games.tips import consejo_evaluacion, consejos_nivel
 def resultado_tipo(acto: dict, nivel: dict, estrellas: int) -> dict:
     """Resultado verosímil para ese nivel con ese número de estrellas."""
     m = acto["mecanica"]
+    if m == "canon" and nivel.get("ritmo_s"):
+        fuera = {0: 0, 1: 5, 2: 1, 3: 0}[estrellas]
+        return {"prueba": "silla", "tiempo": None if estrellas == 0 else 20.0, "completado": estrellas > 0,
+                "repeticiones": 3 if estrellas == 0 else 5, "objetivo": 5, "fuera_ritmo": fuera, "ritmo": True}
     if m == "canon":
         t = {0: None, 1: nivel["estrellas_s"][0] - 1, 2: nivel["estrellas_s"][1] - 0.5, 3: 5.0}[estrellas]
         return {"prueba": "silla", "tiempo": t, "completado": t is not None, "repeticiones": 3 if t is None else 5,

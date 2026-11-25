@@ -90,7 +90,22 @@ def _consejos_cruzar(nivel: dict, res: dict, estrellas: int) -> list[str]:
             "Cuanto menos se incline, menos se para: corrige antes de que aparezca la flecha naranja."]
 
 
+def _consejos_ritmo(nivel: dict, res: dict, estrellas: int) -> list[str]:
+    objetivo = int(res.get("objetivo", nivel.get("repeticiones", C.SILLA_REPETICIONES)))
+    fuera = int(res.get("fuera_ritmo", 0))
+    truco = ("Empieza a levantarte un poco antes del golpe: tienes que estar de pie justo cuando suene "
+             "el tambor (el anillo se pone verde).")
+    if estrellas == 0:
+        return [f"Hiciste {res.get('repeticiones', 0)} de {objetivo} levantadas al ritmo: completa las "
+                f"{objetivo} en menos de {_s(nivel['tiempo_limite_s'])} s para conseguir 1 estrella.", truco]
+    maximo = nivel["estrellas_fallos"][estrellas]
+    permitido = "ninguna" if maximo == 0 else f"como mucho {maximo}"
+    return [f"Tuviste {fuera} levantadas fuera de ritmo. Para {estrellas + 1} estrellas, {permitido}.", truco]
+
+
 def _consejos_silla(nivel: dict, res: dict, estrellas: int) -> list[str]:
+    if nivel.get("ritmo_s"):
+        return _consejos_ritmo(nivel, res, estrellas)
     tiempos = nivel["estrellas_s"]
     objetivo = int(res.get("objetivo", nivel.get("repeticiones", C.SILLA_REPETICIONES)))
     lista: list[str] = []

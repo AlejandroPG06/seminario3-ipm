@@ -1,4 +1,6 @@
 """Contador de la silla con secuencias sintéticas."""
+import pytest
+
 from games.chair_counter import DE_PIE, SENTADO, ContadorSilla
 
 DT = 1 / 30
@@ -63,3 +65,22 @@ def test_manos_marcan_y_pueden_invalidar():
     assert all(r.calidad == "Buena" for r in c.repeticiones)
     estricto = contar(ciclos(2), manos=True, manos_invalida=True)
     assert estricto.cuenta == 0 and len(estricto.incompletas) == 2
+
+
+def test_ritmo_del_canon():
+    from games.chair_counter import Ritmo
+    r = Ritmo(3.0, 0.6)
+    assert r.al_ritmo(3.2) and r.al_ritmo(5.5) and not r.al_ritmo(4.5) and not r.al_ritmo(1.0)
+    assert r.desfase(2.7) == pytest.approx(-0.3)
+    assert r.golpe(2.95, 3.01) and not r.golpe(3.01, 3.5) and not r.golpe(0.0, 0.5)
+    assert 0 <= r.fase(4.0) < 1
+
+
+def test_anular_la_ultima_repeticion():
+    from games.chair_counter import ContadorSilla
+    c = ContadorSilla()
+    for a in (90, 130, 170):
+        c.actualizar(a, 0.1)
+    assert c.cuenta == 1
+    rep = c.anular_ultima()
+    assert c.cuenta == 0 and rep.calidad == "Fuera de ritmo" and c.incompletas == [rep]

@@ -9,6 +9,7 @@ from __future__ import annotations
 import math
 from typing import Callable
 
+import cv2
 import numpy as np
 
 import config as C
@@ -16,7 +17,7 @@ from core.calibration import Calibracion, pierna
 from core.geometry import angulo, distancia
 from core.gestures import DetectorBrazosArriba
 from core.pose import MonitorVisibilidad, PoseFrame
-from games.chair_counter import ContadorSilla
+from games.chair_counter import ContadorSilla, Ritmo
 from games.scoring import distancia_canon, puntos_silla
 from scenes.base import Scene, Transicion
 from ui.dwell_button import anillo
@@ -55,6 +56,8 @@ class EscenaSilla(Scene):
         self.objetivo = int(self.nivel.get("repeticiones", C.SILLA_REPETICIONES))
         self.limite = float(self.nivel.get("tiempo_limite_s", C.SILLA_TIEMPO_MAX_S))
         self.estrellas_s = self.nivel.get("estrellas_s", (60, 16.69, 13.69))
+        ritmo_s = self.nivel.get("ritmo_s") if self.aventura else None
+        self.ritmo = Ritmo(float(ritmo_s)) if ritmo_s else None   # nivel «Al ritmo del cañón»
         self.lado = calib.lado
         self.cad, self.rod, self.tob = pierna(self.lado)
         hombro = C.HOMBRO_IZQ if self.lado == "izq" else C.HOMBRO_DER
@@ -75,6 +78,7 @@ class EscenaSilla(Scene):
         self.angulo_rodilla = 0.0
         self.angulo_cadera = 0.0
         self.manos = False
+        self.fuera_ritmo = 0
 
     def _cambiar_fase(self, fase: str) -> None:
         self.fase = fase
@@ -124,14 +128,23 @@ class EscenaSilla(Scene):
         if gesto:
             self._pausar("Pausa")
             return None
+        t_anterior = self.t
         self.t += dt
+        if self.ritmo is not None and self.ritmo.golpe(t_anterior, self.t):
+            self.ctx.audio.reproducir("tambor")
         if pose is not None:
             self.manos = manos_en_rodillas(pose, self.rod, self.calib.longitud_muslo)
             rep = self.contador.actualizar(self.angulo_rodilla, dt, self.manos)
+            if rep is not None and self.ritmo is not None and rep.calidad != "Incompleta" \
+                    and not self.ritmo.al_ritmo(self.t):
+                rep = self.contador.anular_ultima()        # de pie fuera del golpe: no carga el cañón
+                self.fuera_ritmo += 1
             if rep is not None:
                 x, y = pose.px(self.rod)
                 color = {"Perfecta": C.VERDE, "Buena": C.AMARILLO}.get(rep.calidad, C.NARANJA)
                 txt = f"¡{rep.calidad}!" + (" (manos)" if rep.manos else "")
+                if self.ritmo is not None and rep.calidad in ("Perfecta", "Buena"):
+                    txt, color = "¡Al ritmo!", C.VERDE
                 self.textos.anadir(txt, (x, y - 80), color)
                 self.ctx.audio.reproducir("acierto" if rep.calidad != "Incompleta" else "fallo")
         if self.contador.cuenta >= self.objetivo:
@@ -157,7 +170,9 @@ class EscenaSilla(Scene):
             "incompletas": len(self.contador.incompletas),
             "manos": any(r.manos for r in reps),
             "puntos": puntos_silla(reps, tiempo, self.estrellas_s[-1]) if self.aventura else 0,
-            "distancia": distancia_canon(tiempo) if self.aventura else 0.0,
+            "distancia": self._distancia(tiempo) if self.aventura else 0.0,
+            "fuera_ritmo": self.fuera_ritmo,
+            "ritmo": self.ritmo is not None,
             "motivo": "¡Conseguido!" if tiempo is not None else "Se acabó el tiempo",
         }
         if self.aventura and tiempo is not None:
@@ -169,6 +184,13 @@ class EscenaSilla(Scene):
         if tiempo is not None:
             self.confeti.lanzar(self.pose.ancho if self.pose is not None else 1280)
         return None
+
+    def _distancia(self, tiempo: float | None) -> float:
+        """Metros de vuelo: por tiempo o, con ritmo, por la proporción de levantadas al ritmo."""
+        if self.ritmo is None or tiempo is None:
+            return distancia_canon(tiempo)
+        buenas = self.contador.cuenta
+        return max(5.0, C.CANON_DISTANCIA_MAX_M * buenas / max(1, buenas + self.fuera_ritmo))
 
     def on_key(self, tecla: str) -> Transicion:
         if tecla == "esc":
@@ -197,6 +219,10 @@ class EscenaSilla(Scene):
             encabezado = self.acto.get("nombre") if self.aventura else C.NOMBRES_PRUEBA["silla"]
             subtitulo = (self.nivel.get("nombre", "") if self.aventura else modo) + " · Lo más rápido que puedas"
             linea = f"{C.INSTRUCCION_CORTA['silla']} · {self.objetivo} veces"
+            if self.ritmo is not None:
+                linea = f"De pie justo al sonar el tambor · {self.objetivo} veces"
+                subtitulo = (self.nivel.get("nombre", "") + f" · Un golpe cada {self.ritmo.periodo:.0f} s"
+                             " · Sin apoyar las manos")
             pictograms.instrucciones(frame, "silla", encabezado, linea, self.t_fase,
                                      self.brazos.progreso, subtitulo, self.ctx.sprites)
         elif self.fase == "cuenta":
@@ -210,6 +236,8 @@ class EscenaSilla(Scene):
             texto(frame, f"Tiempo: {self.t:.2f} s", (24, 64), 30, C.BLANCO)
             if self.manos:
                 texto(frame, "¡Sin manos en las rodillas!", (W // 2, H - 100), C.TAM_TEXTO + 6, C.NARANJA, "centro")
+            if self.ritmo is not None and self.fase == "jugando":
+                self._dibujar_ritmo(frame)
             if self.fase == "pausa":
                 pictograms.pausa(frame, self.motivo_pausa, repetir=True)
         elif self.fase == "disparo":
@@ -225,6 +253,20 @@ class EscenaSilla(Scene):
         self.textos.dibujar(frame)
         self.confeti.dibujar(frame)
         return frame
+
+    def _dibujar_ritmo(self, frame) -> None:
+        """Tambor arriba en el centro: el anillo se llena hasta el golpe y se pone verde en la ventana válida."""
+        H, W = frame.shape[:2]
+        centro = (W // 2, 100)
+        en_ventana = self.ritmo.al_ritmo(self.t) and self.t >= self.ritmo.periodo - self.ritmo.tolerancia
+        color = C.VERDE if en_ventana else C.AMARILLO
+        cv2.circle(frame, centro, 62, (30, 30, 30), -1, cv2.LINE_AA)
+        anillo(frame, centro, 54, self.ritmo.fase(self.t), color, 12)
+        self.ctx.sprites.tambor(frame, (centro[0], centro[1] + 2), 28, 1.0 if en_ventana else 0.0)
+        texto(frame, "¡ARRIBA!" if en_ventana else "Prepárate…", (W // 2, 170), C.TAM_TEXTO,
+              C.VERDE if en_ventana else C.BLANCO, "centro")
+        if self.fuera_ritmo:
+            texto(frame, f"Fuera de ritmo: {self.fuera_ritmo}", (24, 130), C.TAM_PEQUENO, C.NARANJA)
 
     def _dibujar_canon(self, frame) -> None:
         H, W = frame.shape[:2]
