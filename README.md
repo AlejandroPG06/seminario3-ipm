@@ -1,5 +1,10 @@
-# Práctica 3: Proyecto de Visión por Computador. El Gran Circo del Equilibrio
+# Práctica 3: Proyecto de Visión por Computador. 
 
+## Autores
+- Alejandro Paco García
+- Adrián Díez Agulló
+
+## El Gran Circo del Equilibrio
 Proyecto de visión por computador basado en un juego serio de salud . Convierte dos pruebas de
 la **SPPB** (*Short Physical Performance Battery*), una prueba clínica que se
 usa para estimar la **fragilidad** en personas mayores, en un espectáculo de
@@ -262,7 +267,3 @@ setup.sh, setup.bat   instalación
 Basado en el repositorio de ejemplo de la asignatura:
 [CarloHSUA/IPM](https://github.com/CarloHSUA/IPM) (`app.py` y
 `app_live_stream.py` se conservan como referencia).
-
-## Autores
-- Alejandro Paco García
-- Adrián Díez Agulló
