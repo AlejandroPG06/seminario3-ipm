@@ -1,7 +1,6 @@
 # Práctica 3: Proyecto de Visión por Computador. El Gran Circo del Equilibrio
 
-Proyecto de visión por computador basado en un juego serio de salud (Práctica 2 de
-Interacción Persona-Máquina, Universidad de Alicante). Convierte dos pruebas de
+Proyecto de visión por computador basado en un juego serio de salud . Convierte dos pruebas de
 la **SPPB** (*Short Physical Performance Battery*), una prueba clínica que se
 usa para estimar la **fragilidad** en personas mayores, en un espectáculo de
 circo que se juega solo con el cuerpo, frente a una webcam.
