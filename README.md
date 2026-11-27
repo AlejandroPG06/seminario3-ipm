@@ -1,4 +1,4 @@
-# El Gran Circo del Equilibrio
+# Práctica 3: Proyecto de Visión por Computador. El Gran Circo del Equilibrio
 
 Proyecto de visión por computador basado en un juego serio de salud (Práctica 2 de
 Interacción Persona-Máquina, Universidad de Alicante). Convierte dos pruebas de
