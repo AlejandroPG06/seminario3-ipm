@@ -1,14 +1,14 @@
 # El Gran Circo del Equilibrio
 
-Juego serio de salud controlado por visión por computador (Práctica 2 de
+Proyecto de visión por computador basado en un juego serio de salud (Práctica 2 de
 Interacción Persona-Máquina, Universidad de Alicante). Convierte dos pruebas de
-la **SPPB** (*Short Physical Performance Battery*), una batería clínica que se
+la **SPPB** (*Short Physical Performance Battery*), una prueba clínica que se
 usa para estimar la **fragilidad** en personas mayores, en un espectáculo de
 circo que se juega solo con el cuerpo, frente a una webcam.
 
 ## Para qué sirve
 
-La SPPB (Guralnik et al., 1994) mide el equilibrio, la velocidad de marcha y la
+La SPPB mide el equilibrio, la velocidad de marcha y la
 fuerza de las piernas. Este juego usa dos de sus pruebas:
 
 | Prueba | Qué mide | Puntos |
@@ -18,7 +18,7 @@ fuerza de las piernas. Este juego usa dos de sus pruebas:
 
 La prueba de marcha de 4 m no es viable con una webcam, así que la puntuación
 va de **0 a 8** en lugar de 0 a 12. La interpretación que muestra el juego es
-**orientativa y no es un diagnóstico**.
+**orientativa y no es un diagnóstico real**.
 
 Además se incluyen dos **pruebas complementarias** con base clínica, que dan
 su propio resultado y **no suman a la SPPB**:
@@ -258,18 +258,12 @@ tests/                pytest con poses sintéticas
 setup.sh, setup.bat   instalación
 ```
 
-## Referencias
-
-- Guralnik JM, et al. *A short physical performance battery assessing lower
-  extremity function*. J Gerontol. 1994;49(2):M85-94.
-- Vellas BJ, et al. *One-leg balance is an important predictor of injurious
-  falls in older persons*. J Am Geriatr Soc. 1997;45(6):735-8.
-- Rikli RE, Jones CJ. *Senior Fitness Test Manual*. Human Kinetics, 2013
-  (2-Minute Step Test).
-- [MediaPipe Pose Landmarker](https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker?hl=es-419).
-
 ## Créditos
 
 Basado en el repositorio de ejemplo de la asignatura:
 [CarloHSUA/IPM](https://github.com/CarloHSUA/IPM) (`app.py` y
 `app_live_stream.py` se conservan como referencia).
+
+## Autores
+- Alejandro Paco García
+- Adrián Díez Agulló
